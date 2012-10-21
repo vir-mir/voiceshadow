@@ -10,10 +10,10 @@ if ($ADMIN->fulltree) {
                            get_string('configmaxbytes', 'voiceshadow'), 1048576, get_max_upload_sizes($CFG->maxbytes)));
     }
 
-    $options = array(voiceshadow_COUNT_WORDS   => trim(get_string('numwords', '', '?')),
-                     voiceshadow_COUNT_LETTERS => trim(get_string('numletters', '', '?')));
+    $options = array(VOICESHADOW_COUNT_WORDS   => trim(get_string('numwords', '', '?')),
+                     VOICESHADOW_COUNT_LETTERS => trim(get_string('numletters', '', '?')));
     $settings->add(new admin_setting_configselect('voiceshadow_itemstocount', get_string('itemstocount', 'voiceshadow'),
-                       get_string('configitemstocount', 'voiceshadow'), voiceshadow_COUNT_WORDS, $options));
+                       get_string('configitemstocount', 'voiceshadow'), VOICESHADOW_COUNT_WORDS, $options));
 
     $settings->add(new admin_setting_configcheckbox('voiceshadow_showrecentsubmissions', get_string('showrecentsubmissions', 'voiceshadow'),
                        get_string('configshowrecentsubmissions', 'voiceshadow'), 1));

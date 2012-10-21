@@ -4,12 +4,15 @@ define('VOICESHADOW_VIDEOTYPES', json_encode(array("video/quicktime", "video/mp4
 define('VOICESHADOW_AUDIOTYPES', json_encode(array("audio/x-wav", "audio/mpeg", "audio/wav", "audio/mp4a", "audio/mp4", "audio/mp3")));
     
     
-define('FILTER_ALL', 0);
-define('FILTER_SUBMITTED', 1);
-define('FILTER_REQUIRE_GRADING', 2);
+//define('FILTER_ALL', 0);
+//define('FILTER_SUBMITTED', 1);
+//define('FILTER_REQUIRE_GRADING', 2);
 
-define('GRADEITEMNUMBER_BEFORE', 0);
-define('GRADEITEMNUMBER_AFTER', 1);
+//define('GRADEITEMNUMBER_BEFORE', 0);
+//define('GRADEITEMNUMBER_AFTER', 1);
+
+define('VOICESHADOW_COUNT_WORDS', 1);
+define('VOICESHADOW_COUNT_LETTERS', 2);
 
 
 function voiceshadow_add_instance($voiceshadow) {
@@ -188,6 +191,9 @@ function voiceshadow_cron () {
             $file_record->filename  = $item->filename.".mp3";
 
             $itemid = $fs->create_file_from_pathname($file_record, $to);
+            
+            $file = videoboard_getfileid($itemid->get_id());
+            @chmod($file->fullpatch, 0755);
             
             if ($table == 'voiceshadow') 
               $DB->set_field($table, "fileid", $itemid->get_id(), array("id" => $item->id));
