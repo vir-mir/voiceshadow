@@ -192,7 +192,7 @@ function voiceshadow_cron () {
 
             $itemid = $fs->create_file_from_pathname($file_record, $to);
             
-            $file = videoboard_getfileid($itemid->get_id());
+            $file = voiceshadow_getfileid($itemid->get_id());
             @chmod($file->fullpatch, 0755);
             
             if ($table == 'voiceshadow') 
