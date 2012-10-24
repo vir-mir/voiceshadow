@@ -70,6 +70,8 @@ $string['usethisserver'] = 'Use this server';
 $string['descrforconverting'] = 'This method will be use for audio and video files conversion to standart mp3 and mp4 for playing right in browser.';
 $string['converturl'] = 'Media server URL';
 $string['descrforconvertingurl'] = 'If you choose "Use media convert server", you need setup server URL';
+$string['preplayer'] = 'Try to play wav before mp3 converting';
+$string['preplayerdescr'] = 'Try to play wav nanogongs files when mp3 conversion in process.';
 
 
 

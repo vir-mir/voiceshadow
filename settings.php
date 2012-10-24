@@ -25,6 +25,14 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect('voiceshadow_convert',
             get_string('convertmethod', 'voiceshadow'), get_string('descrforconverting', 'voiceshadow'), 1, $options));
             
+    //preplayer
+    
+    $options = array();
+    $options[1] = get_string('yes');
+    $options[2] = get_string('no');
+    $settings->add(new admin_setting_configselect('voiceshadow_preplayer',
+            get_string('preplayer', 'voiceshadow'), get_string('preplayerdescr', 'voiceshadow'), 1, $options));
+            
     // Converting url
     $settings->add(new admin_setting_configtext('voiceshadow_convert_url',
             get_string('converturl', 'voiceshadow'), get_string('descrforconvertingurl', 'voiceshadow'), '', PARAM_URL));

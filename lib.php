@@ -585,7 +585,29 @@ function voiceshadow_player($ids, $table = "voiceshadow_files"){
     
     if ($data = $DB->get_record($table, array("id" => $ids))) {
       if ($data->itemid == 0) {
-        return get_string('pleasewaitinprocess', 'voiceshadow');
+/*
+* Show nanogong if wav and mp3 not ready
+*/ 
+        $o = "";
+        if (!empty($data->itemoldid) && $CFG->voiceshadow_preplayer == 1){
+          if ($item = $DB->get_record("files", array("id"=>$data->itemoldid))){
+            if ($item->mimetype == 'audio/wav') {
+              $link = new moodle_url("/pluginfile.php/".$item->contextid."/mod_voiceshadow/".$ids."/".$data->itemoldid."/".$item->filename);
+              
+              $o .= html_writer::start_tag("div");
+              $o .= html_writer::start_tag("applet", array("id" => "nanogong", "archive" => "nanogong.jar", "code" => "gong.NanoGong", "width" => "180", "height" => "40"));
+              $o .= html_writer::empty_tag("param", array("name" => "Color", "value" => "#ffffff"));
+              $o .= html_writer::empty_tag("param", array("name" => "AudioFormat", "value" => "ImaADPCM"));
+              $o .= html_writer::empty_tag("param", array("name" => "ShowRecordButton", "value" => "false"));
+              $o .= html_writer::empty_tag("param", array("name" => "ShowAudioLevel", "value" => "false"));
+              $o .= html_writer::empty_tag("param", array("name" => "SoundFileURL", "value" => $link));
+              $o .= html_writer::end_tag('applet');
+              $o .= html_writer::end_tag('div');
+            }
+          }
+        }
+
+        return get_string('pleasewaitinprocess', 'voiceshadow').$o;
       } else {
         if ($item = $DB->get_record("files", array("id" => $data->itemid))) {
           //$f = get_file_storage();

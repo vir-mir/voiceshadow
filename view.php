@@ -266,9 +266,9 @@ if ($a == "list") {
             
             $chtml .= html_writer::tag('div', $comment->summary, array('style'=>'margin:10px 0;'));
             
-            if (!empty($comment->itemid)) {
-              $chtml .= html_writer::tag('div', voiceshadow_player($comment->id, "voiceshadow_comments"));
-            }
+            //if (!empty($comment->itemid)) {
+            $chtml .= html_writer::tag('div', voiceshadow_player($comment->id, "voiceshadow_comments"));
+            //}
             
             $chtml .= html_writer::tag('div', html_writer::tag('small', date(get_string("timeformat1", "voiceshadow"), $comment->time)), array("style" => "float:left;"));
             
