@@ -149,7 +149,8 @@ if ($act == "deleteentry" && !empty($fileid)) {
 
 if ($act == "deleteentry" && !empty($filename)) {
     $filename = end(explode("/", $filename));
-    $DB->delete_records("voiceshadow_files", array("filelink" => $filename, "userid" => $USER->id));
+    list($filename) = explode(".", $filename);
+    $DB->delete_records("voiceshadow_files", array("filename" => $filename, "userid" => $USER->id));
 }
 
 if ($act == "deletecomment" && !empty($fileid)) {
