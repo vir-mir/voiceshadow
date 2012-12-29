@@ -1,4 +1,4 @@
-<?php  // $Id: lib.php,v 1.2 2012/03/10 22:00:00 Serafim Panov Exp $
+<?php  // $Id: lib.php,v 1.2 2012/03/10 22:00:01 Serafim Panov Exp $
 
 define('VOICESHADOW_VIDEOTYPES', json_encode(array("video/quicktime", "video/mp4")));
 define('VOICESHADOW_AUDIOTYPES', json_encode(array("audio/x-wav", "audio/mpeg", "audio/wav", "audio/mp4a", "audio/mp4", "audio/mp3")));
@@ -660,7 +660,7 @@ function voiceshadow_player($ids, $table = "voiceshadow_files"){
 
 function voiceshadow_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
     global $CFG, $DB;
-    
+
     $id = array_shift($args);
 
     if ($context->contextlevel != CONTEXT_MODULE && $context->contextlevel != CONTEXT_USER) {
@@ -669,15 +669,15 @@ function voiceshadow_pluginfile($course, $cm, $context, $filearea, $args, $force
     
     require_login($course, false, $cm);
 
-    //if (!$voiceshadow = $DB->get_record('voiceshadow', array('id'=>$cm->instance))) {
-    //    return false;
-    //}
+    if (!$voiceshadow = $DB->get_record('voiceshadow', array('id'=>$cm->instance))) {
+        return false;
+    }
     
     $f = get_file_storage();
 
     if ($file_record = $DB->get_record('files', array('id'=>$id))) {
       $file = $f->get_file_instance($file_record);
-      voiceshadow_send_stored_file($file, 0, 0, false);  //forcedownload false
+      voiceshadow_send_stored_file($file, 86400, 0, false);  //forcedownload false
     } else {
       send_file_not_found();
     }
@@ -728,6 +728,7 @@ function voiceshadow_getfileid($itemid){
 function voiceshadow_send_stored_file($stored_file, $lifetime=86400 , $filter=0, $forcedownload=false, $filename=null, $dontdie=false) {
     global $CFG, $COURSE, $SESSION;
     
+
     if (!$stored_file or $stored_file->is_directory()) {
         // nothing to serve
         if ($dontdie) {
@@ -745,6 +746,7 @@ function voiceshadow_send_stored_file($stored_file, $lifetime=86400 , $filter=0,
     // Use given MIME type if specified, otherwise guess it using mimeinfo.
     // IE, Konqueror and Opera open html file directly in browser from web even when directed to save it to disk :-O
     // only Firefox saves all files locally before opening when content-disposition: attachment stated
+    
     $filename     = is_null($filename) ? $stored_file->get_filename() : $filename;
     $isFF         = check_browser_version('Firefox', '1.5'); // only FF > 1.5 properly tested
     $mimetype     = ($forcedownload and !$isFF) ? 'application/x-forcedownload' :
@@ -782,7 +784,6 @@ function voiceshadow_send_stored_file($stored_file, $lifetime=86400 , $filter=0,
     } else {
         header('Content-Disposition: inline; filename="'.$filename.'"');
     }
-
 
         header('Cache-Control: max-age='.$lifetime);
         header('Expires: '. gmdate('D, d M Y H:i:s', time() + $lifetime) .' GMT');
@@ -831,11 +832,10 @@ function voiceshadow_send_stored_file($stored_file, $lifetime=86400 , $filter=0,
 
         //flush the buffers - save memory and disable sid rewrite
         //this also disables zlib compression
-        prepare_file_content_sending();
+        voiceshadow_prepare_file_content_sending();
 
         // send the contents
         $stored_file->readfile();
-
     } else {     // Try to put the file through filters
         if ($mimetype == 'text/html') {
             $options = new stdClass();
@@ -850,11 +850,10 @@ function voiceshadow_send_stored_file($stored_file, $lifetime=86400 , $filter=0,
 
             //flush the buffers - save memory and disable sid rewrite
             //this also disables zlib compression
-            prepare_file_content_sending();
+            voiceshadow_prepare_file_content_sending();
 
             // send the contents
             echo $output;
-
         } else if (($mimetype == 'text/plain') and ($filter == 1)) {
             // only filter text if filter all files is selected
             $options = new stdClass();
@@ -868,27 +867,44 @@ function voiceshadow_send_stored_file($stored_file, $lifetime=86400 , $filter=0,
 
             //flush the buffers - save memory and disable sid rewrite
             //this also disables zlib compression
-            prepare_file_content_sending();
+            voiceshadow_prepare_file_content_sending();
 
             // send the contents
             echo $output;
-
         } else {    // Just send it out raw
             header('Content-Length: '.$filesize);
             header('Content-Type: '.$mimetype);
 
             //flush the buffers - save memory and disable sid rewrite
             //this also disables zlib compression
-            prepare_file_content_sending();
+            voiceshadow_prepare_file_content_sending();
 
             // send the contents
             $stored_file->readfile();
         }
     }
+    
     if ($dontdie) {
         return;
     }
-    die; 
+    die; //no more chars to output!!!
+}
+
+
+function voiceshadow_prepare_file_content_sending() {
+    $olddebug = error_reporting(0);
+
+    if (ini_get_bool('zlib.output_compression')) {
+        ini_set('zlib.output_compression', 'Off');
+    }
+
+    while(ob_get_level()) {
+        if (!ob_end_flush()) {
+            break;
+        }
+    }
+
+    error_reporting($olddebug);
 }
 
 
