@@ -11,7 +11,7 @@ $PAGE->requires->js('/mod/voiceshadow/js/jquery.min.js', true);
 
 class mod_voiceshadow_mod_form extends moodleform_mod {
     function definition() {
-        global $COURSE, $CFG, $form, $USER;
+        global $COURSE, $CFG, $form, $USER, $id;
         $mform    =& $this->_form;
 
         $fmstime = time();

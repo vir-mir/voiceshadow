@@ -239,7 +239,7 @@ function voiceshadow_cron () {
           $from = voiceshadow_getfileid($data->itemid);
           $to   = $CFG->dataroot."/temp/".$item->filename.".mp3";
           
-          voiceshadow_runExternal("/usr/local/bin/ffmpeg -y -i {$from->fullpatch} -acodec libmp3lame -ab 68k -ar 44100 {$to}", &$code); 
+          voiceshadow_runExternal("/usr/local/bin/ffmpeg -y -i {$from->fullpatch} -acodec libmp3lame -ab 68k -ar 44100 {$to}", $code); 
           
           $file_record->filename  = $item->filename.".mp3";
           $itemid = $fs->create_file_from_pathname($file_record, $to);
@@ -663,17 +663,19 @@ function voiceshadow_pluginfile($course, $cm, $context, $filearea, $args, $force
 
     $id = array_shift($args);
 
-    if ($context->contextlevel != CONTEXT_MODULE && $context->contextlevel != CONTEXT_USER) {
-        return false;
-    }
+    //if ($context->contextlevel != CONTEXT_MODULE && $context->contextlevel != CONTEXT_USER) {
+    //    return false;
+    //}
     
-    require_login($course, false, $cm);
+    //require_login($course, false, $cm);
+    
 
     if (!$voiceshadow = $DB->get_record('voiceshadow', array('id'=>$cm->instance))) {
         return false;
     }
     
     $f = get_file_storage();
+    
 
     if ($file_record = $DB->get_record('files', array('id'=>$id))) {
       $file = $f->get_file_instance($file_record);
@@ -3528,7 +3530,7 @@ class mod_voiceshadow_grading_form extends moodleform {
         }
     }
 
-    function add_action_buttons() {
+    function add_action_buttons($cancel = true, $submitlabel = NULL) {
         $mform =& $this->_form;
         //if there are more to be graded.
         if ($this->_customdata->nextid>0) {

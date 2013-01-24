@@ -171,8 +171,9 @@ require_once ('tabs.php');
     }
    
     echo html_writer::table($table);
-        
-    echo html_writer::script('
+
+    if (isset($list))
+      echo html_writer::script('
  $(document).ready(function() {
   $(".voiceshadow_rate_box").change(function() {
     var value = $(this).val();

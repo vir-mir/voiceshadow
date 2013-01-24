@@ -45,7 +45,7 @@ $PAGE->requires->js('/mod/voiceshadow/js/swfobject.js', true);
 $strvoiceshadows = get_string('modulenameplural', 'voiceshadow');
 $strvoiceshadow  = get_string('modulename', 'voiceshadow');
 
-$PAGE->set_url('/mod/voiceshadow/viewhistory.php', array('id' => $id, 'ids' => $ids));
+$PAGE->set_url('/mod/voiceshadow/viewhistory.php', array('id' => $id));
     
 $title = $course->shortname . ': ' . format_string(get_string('modulename', 'voiceshadow'));
 $PAGE->set_title($title);
