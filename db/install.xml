@@ -23,8 +23,13 @@
         <FIELD NAME="var2" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="var1" NEXT="var3"/>
         <FIELD NAME="var3" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="var2" NEXT="var4"/>
         <FIELD NAME="var4" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="var3" NEXT="var5"/>
-        <FIELD NAME="var5" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="var4" NEXT="maxbytes"/>
-        <FIELD NAME="maxbytes" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="100000" SEQUENCE="false" PREVIOUS="var5" NEXT="grademethod"/>
+        <FIELD NAME="var5" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="var4" NEXT="var1text"/>
+        <FIELD NAME="var1text" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="var5" NEXT="var2text"/>
+        <FIELD NAME="var2text" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="var1text" NEXT="var3text"/>
+        <FIELD NAME="var3text" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="var2text" NEXT="var4text"/>
+        <FIELD NAME="var4text" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="var3text" NEXT="var5text"/>
+        <FIELD NAME="var5text" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="var4text" NEXT="maxbytes"/>
+        <FIELD NAME="maxbytes" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="100000" SEQUENCE="false" PREVIOUS="var5text" NEXT="grademethod"/>
         <FIELD NAME="grademethod" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" DEFAULT="default" ENUM="false" PREVIOUS="maxbytes" NEXT="timedue"/>
         <FIELD NAME="timedue" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="grademethod" NEXT="timeavailable"/>
         <FIELD NAME="timeavailable" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timedue" NEXT="timemodified"/>
@@ -43,8 +48,9 @@
         <FIELD NAME="itemoldid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="summary" NEXT="itemid"/>
         <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="itemoldid" NEXT="itemimgid"/>
         <FIELD NAME="itemimgid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="itemid" NEXT="filename"/>
-        <FIELD NAME="filename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="itemimgid" NEXT="time"/>
-        <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="filename" />
+        <FIELD NAME="filename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="itemimgid" NEXT="var"/>
+        <FIELD NAME="var" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="filename" NEXT="time"/>
+        <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="var" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" />

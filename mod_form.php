@@ -7,12 +7,15 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
 $PAGE->requires->js('/mod/voiceshadow/js/jquery.min.js', true);
+$PAGE->requires->js('/mod/voiceshadow/js/swfobject.js', true);
 
 
 class mod_voiceshadow_mod_form extends moodleform_mod {
     function definition() {
-        global $COURSE, $CFG, $form, $USER, $id;
+        global $COURSE, $CFG, $form, $USER, $update;
         $mform    =& $this->_form;
+        
+        $mform->updateAttributes(array('enctype' => 'multipart/form-data'));
 
         $fmstime = time();
 
@@ -44,36 +47,32 @@ class mod_voiceshadow_mod_form extends moodleform_mod {
         $mform->addElement('select', 'grademethod', get_string('grademethod', "voiceshadow"), array('default'=>get_string('default', "voiceshadow"), 'rubrics'=>get_string('rubrics', "voiceshadow")));
         $mform->setDefault('grademethod', 'default');
         
+        
+        
         $filepickeroptions = array();
         $filepickeroptions['maxbytes']  = get_max_upload_file_size($CFG->maxbytes);
         $mform->addElement('header', 'mp3upload', get_string('mp3upload', 'voiceshadow')); 
-        $mform->addElement('filepicker', 'submitfile', get_string('uploadmp3', 'voiceshadow'), null, $filepickeroptions);
+        
+        $mform->addElement('select', 'countofrecords', get_string('tocreateaslideshow', 'voiceshadow'), Array('1'=>'1', '2'=>'2', '3'=>'3', '4'=>'4', '5'=>'5'), 'onchange="fpresetimages(this);return false;"');
+        $mform->setDefault('countofrecords', 1);
         
         $time = time();
-        $filename = str_replace(" ", "_", $USER->username)."_".date("Ymd_Hi", $time);
+//File 1
+        for ($i=1;$i<=5;$i++){
+          $filename = str_replace(" ", "_", $USER->username)."_".date("Ymd_Hi", $time)."_".$i;
+          
+          $mform->addElement('text', 'var'.$i.'text', get_string('vartext', 'voiceshadow'), array('size'=>'64'));
+          
+          $mform->addElement('filepicker', 'submitfile_'.$i, get_string('uploadmp3', 'voiceshadow'), null, $filepickeroptions);
+          
+          $mediadatavoice  = html_writer::script('var fn = function() {var att = { data:"'.(new moodle_url("/mod/voiceshadow/js/recorder.swf")).'", width:"350", height:"200"};var par = { flashvars:"rate=44&gain=50&prefdevice=&loopback=no&echosupression=yes&silencelevel=0&updatecontrol=poodll_recorded_file&callbackjs=poodllcallback&posturl='.(new moodle_url("/mod/voiceshadow/uploadmp3.php")).'&p1='.$update.'&p2='.$USER->id.'&p3="+$(\'#id_submitfile_'.$i.'\').attr(\'value\')+"&p4='.$filename.'&autosubmit=true&debug=false&lzproxied=false" };var id = "mp3_flash_recorder_'.$i.'";var myObject = swfobject.createSWF(att, par, id);};swfobject.addDomLoadEvent(fn);function poodllcallback(args){console.log(args);}');
+          $mediadatavoice .= '<div id="mp3_flash_header_recorder_'.$i.'" style="display:none"><div id="mp3_flash_recorder_'.$i.'"></div><div>';
+
+          $mform->addelEment('hidden', 'filename_'.$i, $filename);
+          $mform->addElement('html', $mediadatavoice);
+        }
+///
         
-        $mediadata = "";
-        $mediadata .= html_writer::start_tag("applet", array("id" => "nanogong", "archive" => new moodle_url("/mod/voiceshadow/nanogong.jar"), "code" => "gong.NanoGong", "width" => "180", "height" => "40"));
-        $mediadata .= html_writer::empty_tag("param", array("name" => "Color", "value" => "#ffffff"));
-        $mediadata .= html_writer::empty_tag("param", array("name" => "AudioFormat", "value" => "ImaADPCM"));
-        $mediadata .= html_writer::end_tag('applet');
-        
-        $ngurl = str_replace("&amp;", "&", new moodle_url("/mod/voiceshadow/nanogong.php", array("userid"=>$USER->id, "id"=>$id, "filename"=>$filename)));
-        
-        $mediadata .= html_writer::script('
-$(document).ready(function() {
-  $(\'#id_submitbutton\').click(function() {$(\'.loaderlayer\').show();});
-  $(\'#mform1\').live("submit", function(){$(\'.loaderlayer\').show();var applet = document.getElementById("nanogong");var ret = applet.sendGongRequest("PostToForm", "'.$ngurl.'&fid="+$(\'#id_submitfile\').attr(\'value\'), "voicefile","", "temp");});
-});');
-        
-        $mediadata .= html_writer::start_tag("div", array("class" => "loaderlayer", "style" => "display:none;background-color:#FF0000;position:fixed;right:0px;top:0px"));
-        $mediadata .= html_writer::empty_tag("img", array("src" => new moodle_url('/mod/voiceshadow/img/ajax-record-save.gif'), "alt" => get_string("recordsaved", "voiceshadow")));
-        $mediadata .= html_writer::end_tag('div');
-        
-        //$mform->addElement('header', 'Recording', get_string('recordvoice', 'voiceshadow')); 
-        $mform->addelEment('hidden', 'filename', $filename);
-        $mform->addelEment('hidden', 'iphonelink', '');
-        $mform->addElement('static', 'description', '', $mediadata);
         
 //-------------------------------------------------------------------------------
         $mform->addElement('header', 'typedesc', get_string("typeupload", 'voiceshadow'));
@@ -88,6 +87,118 @@ $(document).ready(function() {
         $mform->addHelpButton('resubmit', 'allowdeleting', 'assignment');
         $mform->setDefault('resubmit', 0);
         $mform->setDefault('maxbytes', 10485760);
+        
+        
+        $mform->addElement('html', '<script language="JavaScript">
+            function fpresetimages(e){
+              if($(e).val() == 1){
+                $(\'#fitem_id_submitfile_1\').show();
+                $(\'#mp3_flash_header_recorder_1\').show();
+                $(\'#fitem_id_var1text\').show();
+                $(\'#fitem_id_submitfile_2\').hide();
+                $(\'#mp3_flash_header_recorder_2\').hide();
+                $(\'#fitem_id_var2text\').hide();
+                $(\'#fitem_id_submitfile_3\').hide();
+                $(\'#mp3_flash_header_recorder_3\').hide();
+                $(\'#fitem_id_var3text\').hide();
+                $(\'#fitem_id_submitfile_4\').hide();
+                $(\'#mp3_flash_header_recorder_4\').hide();
+                $(\'#fitem_id_var4text\').hide();
+                $(\'#fitem_id_submitfile_5\').hide();
+                $(\'#mp3_flash_header_recorder_5\').hide();
+                $(\'#fitem_id_var5text\').hide();
+              } else if($(e).val() == 2){
+                $(\'#fitem_id_submitfile_1\').show();
+                $(\'#mp3_flash_header_recorder_1\').show();
+                $(\'#fitem_id_var1text\').show();
+                $(\'#fitem_id_submitfile_2\').show();
+                $(\'#mp3_flash_header_recorder_2\').show();
+                $(\'#fitem_id_var2text\').show();
+                $(\'#fitem_id_submitfile_3\').hide();
+                $(\'#mp3_flash_header_recorder_3\').hide();
+                $(\'#fitem_id_var3text\').hide();
+                $(\'#fitem_id_submitfile_4\').hide();
+                $(\'#mp3_flash_header_recorder_4\').hide();
+                $(\'#fitem_id_var4text\').hide();
+                $(\'#fitem_id_submitfile_5\').hide();
+                $(\'#mp3_flash_header_recorder_5\').hide();
+                $(\'#fitem_id_var5text\').hide();
+              } else if($(e).val() == 3){
+                $(\'#fitem_id_submitfile_1\').show();
+                $(\'#mp3_flash_header_recorder_1\').show();
+                $(\'#fitem_id_var1text\').show();
+                $(\'#fitem_id_submitfile_2\').show();
+                $(\'#mp3_flash_header_recorder_2\').show();
+                $(\'#fitem_id_var2text\').show();
+                $(\'#fitem_id_submitfile_3\').show();
+                $(\'#mp3_flash_header_recorder_3\').show();
+                $(\'#fitem_id_var3text\').show();
+                $(\'#fitem_id_submitfile_4\').hide();
+                $(\'#mp3_flash_header_recorder_4\').hide();
+                $(\'#fitem_id_var4text\').hide();
+                $(\'#fitem_id_submitfile_5\').hide();
+                $(\'#mp3_flash_header_recorder_5\').hide();
+                $(\'#fitem_id_var5text\').hide();
+              } else if($(e).val() == 4){
+                $(\'#fitem_id_submitfile_1\').show();
+                $(\'#mp3_flash_header_recorder_1\').show();
+                $(\'#fitem_id_var1text\').show();
+                $(\'#fitem_id_submitfile_2\').show();
+                $(\'#mp3_flash_header_recorder_2\').show();
+                $(\'#fitem_id_var2text\').show();
+                $(\'#fitem_id_submitfile_3\').show();
+                $(\'#mp3_flash_header_recorder_3\').show();
+                $(\'#fitem_id_var3text\').show();
+                $(\'#fitem_id_submitfile_4\').show();
+                $(\'#mp3_flash_header_recorder_4\').show();
+                $(\'#fitem_id_var4text\').show();
+                $(\'#fitem_id_submitfile_5\').hide();
+                $(\'#mp3_flash_header_recorder_5\').hide();
+                $(\'#fitem_id_var5text\').hide();
+              } else if($(e).val() == 5){
+                $(\'#fitem_id_submitfile_1\').show();
+                $(\'#mp3_flash_header_recorder_1\').show();
+                $(\'#fitem_id_var1text\').show();
+                $(\'#fitem_id_submitfile_2\').show();
+                $(\'#mp3_flash_header_recorder_2\').show();
+                $(\'#fitem_id_var2text\').show();
+                $(\'#fitem_id_submitfile_3\').show();
+                $(\'#mp3_flash_header_recorder_3\').show();
+                $(\'#fitem_id_var3text\').show();
+                $(\'#fitem_id_submitfile_4\').show();
+                $(\'#mp3_flash_header_recorder_4\').show();
+                $(\'#fitem_id_var4text\').show();
+                $(\'#fitem_id_submitfile_5\').show();
+                $(\'#mp3_flash_header_recorder_5\').show();
+                $(\'#fitem_id_var5text\').show();
+              }
+            }
+            
+            $(document).ready(function() {
+              $(\'#fitem_id_submitfile_1\').show();
+              $(\'#mp3_flash_header_recorder_1\').show();
+              $(\'#fitem_id_var1text\').show();
+              $(\'#fitem_id_submitfile_2\').hide();
+              $(\'#mp3_flash_header_recorder_2\').hide();
+              $(\'#fitem_id_var2text\').hide();
+              $(\'#fitem_id_submitfile_3\').hide();
+              $(\'#mp3_flash_header_recorder_3\').hide();
+              $(\'#fitem_id_var3text\').hide();
+              $(\'#fitem_id_submitfile_4\').hide();
+              $(\'#mp3_flash_header_recorder_4\').hide();
+              $(\'#fitem_id_var4text\').hide();
+              $(\'#fitem_id_submitfile_5\').hide();
+              $(\'#mp3_flash_header_recorder_5\').hide();
+              $(\'#fitem_id_var5text\').hide();
+            });
+            </script>
+            <style>
+            #fitem_id_submitfile_1{float:left;width:600px;}
+            #fitem_id_submitfile_2{float:left;width:600px;}
+            #fitem_id_submitfile_3{float:left;width:600px;}
+            #fitem_id_submitfile_4{float:left;width:600px;}
+            #fitem_id_submitfile_5{float:left;width:600px;}
+            </style>');
 //-------------------------------------------------------------------------------
         $this->standard_coursemodule_elements();
 //-------------------------------------------------------------------------------

@@ -18,29 +18,15 @@ define('VOICESHADOW_COUNT_LETTERS', 2);
 function voiceshadow_add_instance($voiceshadow) {
     global $USER, $DB, $CFG;
     
-    if(!empty($voiceshadow->submitfile)) {
-      if ($file = voiceshadow_getfile($voiceshadow->submitfile)){
-        $voiceshadow->fileid = $file->id;
-        if (mimeinfo('type', $file->filename) == 'audio/wav') {
-          $add         = new stdClass;
-          $add->itemid = $file->id;
-          $add->type   = mimeinfo('type', $file->filename);
-          $add->status = 'open';
-          $add->name   = md5($CFG->wwwroot.'_'.time());
-          $add->time   = time();
+    for($i=1;$i<=5;$i++) {
+      $name1 = "submitfile_{$i}";
+      $name2 = "var{$i}";
+      if(!empty($voiceshadow->{$name1})) {
+        if ($file = voiceshadow_getfile($voiceshadow->{$name1})){
+          $voiceshadow->{$name2} = $file->id;
           
-          $DB->insert_record("voiceshadow_process", $add);
-        } else {
-          if ($tdata = $DB->get_records("files", array("itemid"=>$file->itemid))){
-            foreach($tdata as $tdata_){
-              $add            = new stdClass;
-              $add->id        = $tdata_->id;
-              $add->component = 'mod_voiceshadow';
-              $add->filearea  = 'private';
-              
-              $DB->update_record("files", $add);
-            }
-          }
+          $DB->set_field("files", "filearea", "public", array("id"=>$file->id));
+          $DB->set_field("files", "filearea", "public", array("id"=>($file->id + 1)));
         }
       }
     }
@@ -58,28 +44,15 @@ function voiceshadow_add_instance($voiceshadow) {
 function voiceshadow_update_instance($voiceshadow) {
     global $USER, $DB, $CFG;
     
-    if(!empty($voiceshadow->submitfile)) {
-      if ($file = voiceshadow_getfile($voiceshadow->submitfile)){
-        $voiceshadow->fileid = $file->id;
-        if (mimeinfo('type', $file->filename) == 'audio/wav') {
-          $add         = new stdClass;
-          $add->itemid = $file->id;
-          $add->type   = mimeinfo('type', $file->filename);
-          $add->status = 'open';
-          $add->name   = md5($CFG->wwwroot.'_'.time());
+    for($i=1;$i<=5;$i++) {
+      $name1 = "submitfile_{$i}";
+      $name2 = "var{$i}";
+      if(!empty($voiceshadow->{$name1})) { 
+        if ($file = voiceshadow_getfile($voiceshadow->{$name1})){
+          $voiceshadow->{$name2} = $file->id;
           
-          $DB->insert_record("voiceshadow_process", $add);
-        } else {
-          if ($tdata = $DB->get_records("files", array("itemid"=>$file->itemid))){
-            foreach($tdata as $tdata_){
-              $add            = new stdClass;
-              $add->id        = $tdata_->id;
-              $add->component = 'mod_voiceshadow';
-              $add->filearea  = 'private';
-              
-              $DB->update_record("files", $add);
-            }
-          }
+          $DB->set_field("files", "filearea", "public", array("id"=>$file->id));
+          $DB->set_field("files", "filearea", "public", array("id"=>($file->id + 1)));
         }
       }
     }
@@ -88,7 +61,7 @@ function voiceshadow_update_instance($voiceshadow) {
     $voiceshadow->id   = $voiceshadow->instance;
     
     voiceshadow_grade_item_update($voiceshadow);
-    
+
     return $DB->update_record('voiceshadow', $voiceshadow);
 }
 

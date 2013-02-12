@@ -7,6 +7,7 @@
     $id                     = optional_param('id', 0, PARAM_INT);
     $uid                    = optional_param('uid', 0, PARAM_INT);
     $time                   = optional_param('time', 0, PARAM_INT);
+    $var                    = optional_param('gvar', 0, PARAM_INT);
     
     if ($id) {
         if (! $cm = $DB->get_record("course_modules", array("id"=> $id))) {
@@ -32,8 +33,10 @@
         }
     }
     
-    $linktofile = $CFG->wwwroot.'/mod/voiceshadow/file.php?file='.$voiceshadow->fileid;
-    $file       = voiceshadow_getfileid($voiceshadow->fileid);
+    $name = "var{$var}";
+    
+    $linktofile = $CFG->wwwroot.'/mod/voiceshadow/file.php?file='.$voiceshadow->{$name};
+    $file       = voiceshadow_getfileid($voiceshadow->{$name});
     
     $AF = new AudioFile;
     if (is_file($file->fullpatch)) {

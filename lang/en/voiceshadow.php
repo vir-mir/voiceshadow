@@ -12,7 +12,7 @@ $string['voiceshadowfieldset'] = 'Custom example fieldset';
 $string['voiceshadowintro'] = 'voiceshadow Intro';
 $string['voiceshadowname'] = 'voiceshadow Name';
 $string['voiceshadow_list'] = 'List of recordings ';
-$string['voiceshadow_add_record'] = 'Record audio/video';
+$string['voiceshadow_add_record'] = 'Record audio';
 $string['mp3upload'] = 'Upload file';
 $string['uploadmp3'] = 'Upload *.mp3';
 $string['recordvoice'] = 'Record voice or video';
@@ -273,4 +273,7 @@ $string['yoursubmission'] = 'Your submission';
 $string['rubrics'] = 'Rubrics';
 $string['default'] = 'Simple direct grading';
 $string['grademethod'] = 'Grading method';
+
+$string['tocreateaslideshow'] = 'Select the number of model sounds to upload';
+$string['vartext'] = 'Audio name';
 
