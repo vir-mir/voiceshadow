@@ -217,8 +217,8 @@ class voiceshadow_online extends voiceshadow_base {
                   return $output;
     }
 
-    function print_user_files($userid, $return=false) {
-        global $OUTPUT, $CFG;
+    function print_user_files($userid=0, $return=false) {
+        global $OUTPUT, $CFG, $USER;
 
         //if (!$submission = $this->get_submission($userid)) {
         //    return '';
@@ -244,8 +244,8 @@ class voiceshadow_online extends voiceshadow_base {
         */
         $wordcount .= '</p>';
 
-        $text = file_rewrite_pluginfile_urls($submission->data1, 'pluginfile.php', $this->context->id, 'mod_voiceshadow', $this->filearea, $submission->id);
-        return $wordcount . format_text($text, $submission->data2, array('overflowdiv'=>true));
+        //$text = file_rewrite_pluginfile_urls($submission->data1, 'pluginfile.php', $this->context->id, 'mod_voiceshadow', $this->filearea, $submission->id);
+        return $wordcount;// . format_text($text, $submission->data2, array('overflowdiv'=>true));
     }
 
     function preprocess_submission(&$submission) {

@@ -60,6 +60,11 @@ $table->width = "100%";
 foreach ($lists as $list) {
   if ($cml = get_coursemodule_from_id('voiceshadow', $list->instance)) {
     if ($cml->course == $cm->course && $cml->instance == $cm->instance) {
+      $name = "var".$list->var."text";
+      
+      $userdata  = $DB->get_record("user", array("id" => $list->userid));
+      $picture   = $OUTPUT->user_picture($userdata, array('popup' => true));
+      
       $o = "";
       $o .= html_writer::start_tag('div', array("style" => "text-align:left;margin:10px 0;"));
       $o .= html_writer::tag('span', $picture);
@@ -71,6 +76,9 @@ foreach ($lists as $list) {
       $o .= html_writer::tag('div', $list->summary, array('style'=>'margin:10px 0;'));
       
       $o .= html_writer::tag('div', voiceshadow_player($list->id));
+      
+      if (!empty($voiceshadow->{$name}))
+        $o .= html_writer::tag('div', "(".$voiceshadow->{$name}.")");
       
       $o .= html_writer::tag('div', html_writer::tag('small', date(get_string("timeformat1", "voiceshadow"), $list->time)), array("style" => "float:left;"));
       

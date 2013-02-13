@@ -224,7 +224,8 @@ if ($a == "list") {
         
         $o .= html_writer::tag('div', voiceshadow_player($list->id));
         
-        $o .= html_writer::tag('div', "(".$voiceshadow->{$name}.")");
+        if (!empty($voiceshadow->{$name}))
+          $o .= html_writer::tag('div', "(".$voiceshadow->{$name}.")");
         
         $o .= html_writer::tag('div', html_writer::tag('small', date(get_string("timeformat1", "voiceshadow"), $list->time)), array("style" => "float:left;"));
         

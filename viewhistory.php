@@ -67,12 +67,14 @@ require_once ('tabs.php');
     foreach ($lists as $list) {
       if ($cml = get_coursemodule_from_id('voiceshadow', $list->instance)) {
         if ($cml->course == $cm->course) {
+          $name = "var".$list->var."text";
+          
           $userdata    = $DB->get_record("user", array("id" => $list->userid));
           $picture     = $OUTPUT->user_picture($userdata, array('popup' => true));
                   
           $own = $DB->get_record("voiceshadow_ratings", array("fileid" => $list->id, "userid" => $list->userid));
               
-          if (empty($own->ratingrhythm)) $own->ratingrhythm = get_string('norateyet', 'voiceshadow');
+          if (@empty($own->ratingrhythm)) @$own->ratingrhythm = get_string('norateyet', 'voiceshadow');
           if (empty($own->ratingclear))  $own->ratingclear = get_string('norateyet', 'voiceshadow');
           if (empty($own->ratingintonation)) $own->ratingintonation = get_string('norateyet', 'voiceshadow');
           if (empty($own->ratingspeed)) $own->ratingspeed = get_string('norateyet', 'voiceshadow');
@@ -90,6 +92,9 @@ require_once ('tabs.php');
           $o .= html_writer::tag('div', $list->summary, array('style'=>'margin:10px 0;'));
           
           $o .= html_writer::tag('div', voiceshadow_player($list->id));
+          
+          if (!empty($voiceshadow->{$name}))
+            $o .= html_writer::tag('div', "(".$voiceshadow->{$name}.")");
           
           $o .= html_writer::tag('div', html_writer::tag('small', date(get_string("timeformat1", "voiceshadow"), $list->time)), array("style" => "float:left;"));
           
@@ -133,7 +138,7 @@ require_once ('tabs.php');
               
               if (!empty($comment->itemid))
                 $chtml .= html_writer::tag('div', voiceshadow_player($comment->id, "voiceshadow_comments"));
-              
+                
               $chtml .= html_writer::tag('div', html_writer::tag('small', date(get_string("timeformat1", "voiceshadow"), $comment->time)), array("style" => "float:left;"));
               
               if ($comment->userid == $USER->id || has_capability('mod/voiceshadow:teacher', $context)) {
