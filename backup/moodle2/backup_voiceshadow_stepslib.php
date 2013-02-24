@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Define the complete videoboard structure for backup, with file and id annotations
+ * Define the complete voiceshadow structure for backup, with file and id annotations
  */     
-class backup_videoboard_activity_structure_step extends backup_activity_structure_step {
+class backup_voiceshadow_activity_structure_step extends backup_activity_structure_step {
  
     protected function define_structure() {
  
@@ -11,7 +11,7 @@ class backup_videoboard_activity_structure_step extends backup_activity_structur
         $userinfo = $this->get_setting_value('userinfo');
  
         // Define each element separated
-        $videoboard = new backup_nested_element('videoboard', array('id'), array(
+        $voiceshadow = new backup_nested_element('voiceshadow', array('id'), array(
             'course', 'name', 'intro', 'introformat', 'timeopen', 'timeclose', 'teacher', 'embedvideo', 'recordtype', 'timemodified'));
         
         $files = new backup_nested_element('files', array('id'), array(
@@ -27,24 +27,24 @@ class backup_videoboard_activity_structure_step extends backup_activity_structur
             'itemid', 'type'));
         
         // Build the tree
-        $videoboard->add_child($files);
-        $videoboard->add_child($ratings);
-        $videoboard->add_child($comments);
-        $videoboard->add_child($process);
+        $voiceshadow->add_child($files);
+        $voiceshadow->add_child($ratings);
+        $voiceshadow->add_child($comments);
+        $voiceshadow->add_child($process);
         
         // Define sources
-        $videoboard->set_source_table('videoboard', array('id' => backup::VAR_ACTIVITYID, 'course' => backup::VAR_COURSEID));
-        $files->set_source_table('videoboard_files', array('instance' => backup::VAR_ACTIVITYID));
-        $comments->set_source_table('videoboard_comments', array('instance' => backup::VAR_ACTIVITYID));
+        $voiceshadow->set_source_table('voiceshadow', array('id' => backup::VAR_ACTIVITYID, 'course' => backup::VAR_COURSEID));
+        $files->set_source_table('voiceshadow_files', array('instance' => backup::VAR_ACTIVITYID));
+        $comments->set_source_table('voiceshadow_comments', array('instance' => backup::VAR_ACTIVITYID));
  
         // Define id annotations
-        $videoboard->annotate_ids('teacher', 'userid');
+        $voiceshadow->annotate_ids('teacher', 'userid');
         $files->annotate_ids('userid', 'userid');
         $ratings->annotate_ids('userid', 'userid');
         $comments->annotate_ids('userid', 'userid');
  
-        // Return the root element (videoboard), wrapped into standard activity structure
+        // Return the root element (voiceshadow), wrapped into standard activity structure
         
-        return $this->prepare_activity_structure($videoboard);
+        return $this->prepare_activity_structure($voiceshadow);
     }
 }

@@ -1,15 +1,15 @@
 <?php
 
 /**
- * videoboard restore task that provides all the settings and steps to perform one
+ * voiceshadow restore task that provides all the settings and steps to perform one
  * complete restore of the activity
  */
  
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/videoboard/backup/moodle2/restore_videoboard_stepslib.php'); // Because it exists (must)
+require_once($CFG->dirroot . '/mod/voiceshadow/backup/moodle2/restore_voiceshadow_stepslib.php'); // Because it exists (must)
  
-class restore_videoboard_activity_task extends restore_activity_task {
+class restore_voiceshadow_activity_task extends restore_activity_task {
  
     /**
      * Define (add) particular settings this activity can have
@@ -22,8 +22,8 @@ class restore_videoboard_activity_task extends restore_activity_task {
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // videoboard only has one structure step
-        $this->add_step(new restore_videoboard_activity_structure_step('videoboard_structure', 'videoboard.xml'));
+        // voiceshadow only has one structure step
+        $this->add_step(new restore_voiceshadow_activity_structure_step('voiceshadow_structure', 'voiceshadow.xml'));
     }
  
     /**
@@ -33,7 +33,7 @@ class restore_videoboard_activity_task extends restore_activity_task {
     static public function define_decode_contents() {
         $contents = array();
  
-        $contents[] = new restore_decode_content('videoboard', array('intro'), 'videoboard');
+        $contents[] = new restore_decode_content('voiceshadow', array('intro'), 'voiceshadow');
  
         return $contents;
     }
@@ -45,10 +45,10 @@ class restore_videoboard_activity_task extends restore_activity_task {
     static public function define_decode_rules() {
         $rules = array();
  /*
-        $rules[] = new restore_decode_rule('videoboardVIEWBYID', '/mod/videoboard/view.php?id=$1', 'course_module');
-        $rules[] = new restore_decode_rule('videoboardREPORTBYID', '/mod/videoboard/report.php?id=$1', 'course_module');
-        $rules[] = new restore_decode_rule('videoboardEXTRACTBYID', '/mod/videoboard/extract.php?id=$1', 'course_module');
-        $rules[] = new restore_decode_rule('videoboardINDEX', '/mod/videoboard/index.php?id=$1', 'course');
+        $rules[] = new restore_decode_rule('voiceshadowVIEWBYID', '/mod/voiceshadow/view.php?id=$1', 'course_module');
+        $rules[] = new restore_decode_rule('voiceshadowREPORTBYID', '/mod/voiceshadow/report.php?id=$1', 'course_module');
+        $rules[] = new restore_decode_rule('voiceshadowEXTRACTBYID', '/mod/voiceshadow/extract.php?id=$1', 'course_module');
+        $rules[] = new restore_decode_rule('voiceshadowINDEX', '/mod/voiceshadow/index.php?id=$1', 'course');
  */
         return $rules;
  
@@ -57,15 +57,15 @@ class restore_videoboard_activity_task extends restore_activity_task {
     /**
      * Define the restore log rules that will be applied
      * by the {@link restore_logs_processor} when restoring
-     * videoboard logs. It must return one array
+     * voiceshadow logs. It must return one array
      * of {@link restore_log_rule} objects
      */
     static public function define_restore_log_rules() {
         $rules = array();
  /*
-        $rules[] = new restore_log_rule('videoboard', 'update feedback', 'report.php?id={course_module}', '{videoboard}');
-        $rules[] = new restore_log_rule('videoboard', 'view', 'view.php?id={course_module}', '{videoboard}');
-        $rules[] = new restore_log_rule('videoboard', 'update entry', 'view.php?id={course_module}', '{videoboard}');
+        $rules[] = new restore_log_rule('voiceshadow', 'update feedback', 'report.php?id={course_module}', '{voiceshadow}');
+        $rules[] = new restore_log_rule('voiceshadow', 'view', 'view.php?id={course_module}', '{voiceshadow}');
+        $rules[] = new restore_log_rule('voiceshadow', 'update entry', 'view.php?id={course_module}', '{voiceshadow}');
  */
         return $rules;
     }
@@ -84,7 +84,7 @@ class restore_videoboard_activity_task extends restore_activity_task {
         $rules = array();
  /*
         // Fix old wrong uses (missing extension)
-        $rules[] = new restore_log_rule('videoboard', 'view all', 'index.php?id={course}', null);
+        $rules[] = new restore_log_rule('voiceshadow', 'view all', 'index.php?id={course}', null);
  */
         return $rules;
     }

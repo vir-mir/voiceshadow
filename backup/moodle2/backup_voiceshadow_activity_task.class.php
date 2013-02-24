@@ -22,14 +22,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . '/mod/videoboard/backup/moodle2/backup_videoboard_stepslib.php'); // Because it exists (must)
-require_once($CFG->dirroot . '/mod/videoboard/backup/moodle2/backup_videoboard_settingslib.php'); // Because it exists (optional)
+require_once($CFG->dirroot . '/mod/voiceshadow/backup/moodle2/backup_voiceshadow_stepslib.php'); // Because it exists (must)
+require_once($CFG->dirroot . '/mod/voiceshadow/backup/moodle2/backup_voiceshadow_settingslib.php'); // Because it exists (optional)
 
 /**
- * videoboard backup task that provides all the settings and steps to perform one
+ * voiceshadow backup task that provides all the settings and steps to perform one
  * complete backup of the activity
  */
-class backup_videoboard_activity_task extends backup_activity_task {
+class backup_voiceshadow_activity_task extends backup_activity_task {
  
     /**
      * Define (add) particular settings this activity can have
@@ -42,8 +42,8 @@ class backup_videoboard_activity_task extends backup_activity_task {
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // videoboard only has one structure step
-        $this->add_step(new backup_videoboard_activity_structure_step('videoboard_structure', 'videoboard.xml'));
+        // voiceshadow only has one structure step
+        $this->add_step(new backup_voiceshadow_activity_structure_step('voiceshadow_structure', 'voiceshadow.xml'));
     }
  
     /**

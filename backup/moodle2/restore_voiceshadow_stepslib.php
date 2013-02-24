@@ -1,25 +1,25 @@
 <?php
 
 /**
- * Structure step to restore one videoboard activity
+ * Structure step to restore one voiceshadow activity
  */
-class restore_videoboard_activity_structure_step extends restore_activity_structure_step {
+class restore_voiceshadow_activity_structure_step extends restore_activity_structure_step {
  
     protected function define_structure() {
  
         $paths = array();
 
-        $paths[] = new restore_path_element('videoboard', '/activity/videoboard');
-        $paths[] = new restore_path_element('videoboard_files', '/activity/videoboard/files');
-        $paths[] = new restore_path_element('videoboard_ratings', '/activity/videoboard/ratings');
-        $paths[] = new restore_path_element('videoboard_comments', '/activity/videoboard/comments');
-        $paths[] = new restore_path_element('videoboard_process', '/activity/videoboard/process');
+        $paths[] = new restore_path_element('voiceshadow', '/activity/voiceshadow');
+        $paths[] = new restore_path_element('voiceshadow_files', '/activity/voiceshadow/files');
+        $paths[] = new restore_path_element('voiceshadow_ratings', '/activity/voiceshadow/ratings');
+        $paths[] = new restore_path_element('voiceshadow_comments', '/activity/voiceshadow/comments');
+        $paths[] = new restore_path_element('voiceshadow_process', '/activity/voiceshadow/process');
  
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
     }
  
-    protected function process_videoboard($data) {
+    protected function process_voiceshadow($data) {
         global $DB;
   
         $data = (object)$data;
@@ -34,8 +34,8 @@ class restore_videoboard_activity_structure_step extends restore_activity_struct
         $data->recordtype = $this->apply_date_offset($data->recordtype);
         $data->teacher = $this->get_mappingid('user', $data->teacher);
  
-        // insert the videoboard record
-        $newitemid = $DB->insert_record('videoboard', $data);
+        // insert the voiceshadow record
+        $newitemid = $DB->insert_record('voiceshadow', $data);
         // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
     }
@@ -46,7 +46,7 @@ class restore_videoboard_activity_structure_step extends restore_activity_struct
         $data = (object)$data;
         $oldid = $data->id;
  
-        $data->instance = $this->get_new_parentid('videoboard');
+        $data->instance = $this->get_new_parentid('voiceshadow');
         
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->summary = $this->apply_date_offset($data->summary);
@@ -69,8 +69,8 @@ class restore_videoboard_activity_structure_step extends restore_activity_struct
         $data->filename = $this->apply_date_offset($data->filename);
         $data->time = $this->apply_date_offset($data->time);
  
-        $newitemid = $DB->insert_record('videoboard_files', $data);
-        $this->set_mapping('videoboard_files', $oldid, $newitemid);
+        $newitemid = $DB->insert_record('voiceshadow_files', $data);
+        $this->set_mapping('voiceshadow_files', $oldid, $newitemid);
     }
     
     protected function process_attendanceslip_ratings($data) {
@@ -79,7 +79,7 @@ class restore_videoboard_activity_structure_step extends restore_activity_struct
         $data = (object)$data;
         $oldid = $data->id;
  
-        $data->fileid = $this->get_new_parentid('videoboard_files');
+        $data->fileid = $this->get_new_parentid('voiceshadow_files');
         
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->rating = $this->apply_date_offset($data->rating);
@@ -91,8 +91,8 @@ class restore_videoboard_activity_structure_step extends restore_activity_struct
         $data->summary = $this->apply_date_offset($data->summary);
         $data->time = $this->apply_date_offset($data->time);
         
-        $newitemid = $DB->insert_record('videoboard_ratings', $data);
-        $this->set_mapping('videoboard_ratings', $oldid, $newitemid);
+        $newitemid = $DB->insert_record('voiceshadow_ratings', $data);
+        $this->set_mapping('voiceshadow_ratings', $oldid, $newitemid);
     }
     
     protected function process_attendanceslip_comments($data) {
@@ -101,10 +101,10 @@ class restore_videoboard_activity_structure_step extends restore_activity_struct
         $data = (object)$data;
         $oldid = $data->id;
  
-        $data->instance = $this->get_new_parentid('videoboard');
+        $data->instance = $this->get_new_parentid('voiceshadow');
         
         $data->userid = $this->get_mappingid('user', $data->userid);
-        $data->fileid = $this->get_new_parentid('videoboard_files');
+        $data->fileid = $this->get_new_parentid('voiceshadow_files');
         $data->summary = $this->apply_date_offset($data->summary);
         
         if (!empty($this->get_mappingid('files', $data->itemoldid)))
@@ -125,8 +125,8 @@ class restore_videoboard_activity_structure_step extends restore_activity_struct
         $data->filename = $this->apply_date_offset($data->filename);
         $data->time = $this->apply_date_offset($data->time);
  
-        $newitemid = $DB->insert_record('videoboard_comments', $data);
-        $this->set_mapping('videoboard_comments', $oldid, $newitemid);
+        $newitemid = $DB->insert_record('voiceshadow_comments', $data);
+        $this->set_mapping('voiceshadow_comments', $oldid, $newitemid);
     }
     
     
@@ -143,12 +143,12 @@ class restore_videoboard_activity_structure_step extends restore_activity_struct
         else
           $data->itemid = $this->apply_date_offset($data->itemid);
  
-        $newitemid = $DB->insert_record('videoboard_process', $data);
-        $this->set_mapping('videoboard_process', $oldid, $newitemid);
+        $newitemid = $DB->insert_record('voiceshadow_process', $data);
+        $this->set_mapping('voiceshadow_process', $oldid, $newitemid);
     }
     
     protected function after_execute() {
-        // Add videoboard related files, no need to match by itemname (just internally handled context)
-        $this->add_related_files('mod_videoboard', 'intro', null);
+        // Add voiceshadow related files, no need to match by itemname (just internally handled context)
+        $this->add_related_files('mod_voiceshadow', 'intro', null);
     }
 }
