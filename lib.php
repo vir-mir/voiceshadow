@@ -388,7 +388,7 @@ function voiceshadow_set_rait ($fileid, $type) {
     
     $list = $DB->get_record ("voiceshadow_files", array("id" => $fileid));
     
-    $cm = get_coursemodule_from_id('videoboard', $list->instance);
+    $cm = get_coursemodule_from_id(NULL, $list->instance);
     
     $context = get_context_instance(CONTEXT_MODULE, $cm->id);
     
