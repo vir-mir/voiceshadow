@@ -384,9 +384,11 @@ function voiceshadow_sort_table_data ($data, $titlesarray, $orderby, $sort) {
 
 
 function voiceshadow_set_rait ($fileid, $type) {
-    global $CFG, $USER, $DB, $cm, $voiceshadow;
+    global $CFG, $USER, $DB, $voiceshadow;
     
     $list = $DB->get_record ("voiceshadow_files", array("id" => $fileid));
+    
+    $cm = get_coursemodule_from_id('videoboard', $list->instance);
     
     $context = get_context_instance(CONTEXT_MODULE, $cm->id);
     
