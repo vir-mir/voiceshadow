@@ -191,6 +191,10 @@ class mod_voiceshadow_mod_form extends moodleform_mod {
               $(\'#mp3_flash_header_recorder_5\').hide();
               $(\'#fitem_id_var5text\').hide();
             });
+            
+            $("#id_timeavailable_enabled").prop("checked", false);
+            
+            $("#id_timedue_enabled").prop("checked", false);
             </script>
             <style>
             #fitem_id_submitfile_1{float:left;width:600px;}

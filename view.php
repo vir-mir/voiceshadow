@@ -18,6 +18,8 @@ $commentid              = optional_param('commentid', 0, PARAM_INT);
 $selectaudiomodel       = optional_param('selectaudiomodel', 0, PARAM_INT); 
 $act                    = optional_param('act', NULL, PARAM_CLEAN); 
 $delfilename            = optional_param('delfilename', NULL, PARAM_TEXT); 
+$sort                   = optional_param('sort', 'firstname', PARAM_CLEAN); 
+$orderby                = optional_param('orderby', 'ASC', PARAM_CLEAN); 
     
     
 if (is_array($summary)) $summary = $summary['text'];
@@ -189,168 +191,174 @@ if ($a == "list") {
     $table->width = "100%";
     
     if (!voiceshadow_is_ios()) {
-      $table->head  = array(get_string("cell1::student", "voiceshadow"), get_string("cell2::", "voiceshadow"), get_string("cell3::peer", "voiceshadow"), get_string("cell4::teacher", "voiceshadow"));
+      $titlesarray = array (get_string("cell1::student", "voiceshadow")=>'username', get_string("cell2::", "voiceshadow")=>'', get_string("cell3::peer", "voiceshadow")=>'', get_string("cell4::teacher", "voiceshadow")=>'');
+        
+      $table->head = voiceshadow_make_table_headers ($titlesarray, $orderby, $sort, 'view.php?id='.$id);
+      //$table->head  = array(get_string("cell1::student", "voiceshadow"), get_string("cell2::", "voiceshadow"), get_string("cell3::peer", "voiceshadow"), get_string("cell4::teacher", "voiceshadow"));
       $table->align = array ("left", "center", "center", "center");
     }
     
     
-        
-    $lists = $DB->get_records ("voiceshadow_files", array("instance" => $id), 'time DESC');
-            
-    foreach ($lists as $list) {
-        $name = "var".$list->var."text";
-        
-        $userdata  = $DB->get_record("user", array("id" => $list->userid));
-        $picture   = $OUTPUT->user_picture($userdata, array('popup' => true));
-                
-        $own = $DB->get_record("voiceshadow_ratings", array("fileid" => $list->id, "userid" => $list->userid));
-            
-        if (@empty($own->ratingrhythm)) @$own->ratingrhythm = get_string('norateyet', 'voiceshadow');
-        if (empty($own->ratingclear))  $own->ratingclear = get_string('norateyet', 'voiceshadow');
-        if (empty($own->ratingintonation)) $own->ratingintonation = get_string('norateyet', 'voiceshadow');
-        if (empty($own->ratingspeed)) $own->ratingspeed = get_string('norateyet', 'voiceshadow');
-        if (empty($own->ratingreproduction)) $own->ratingreproduction = get_string('norateyet', 'voiceshadow');
-            
-        //1-cell
-        $o = "";
-        $o .= html_writer::start_tag('div', array("style" => "text-align:left;margin:10px 0;"));
-        $o .= html_writer::tag('span', $picture);
-        $o .= html_writer::start_tag('span', array("style" => "margin: 8px;position: absolute;"));
-        $o .= html_writer::link(new moodle_url('/user/view.php', array("id" => $userdata->id, "course" => $cm->course)), fullname($userdata));
-        $o .= html_writer::end_tag('span');
-        $o .= html_writer::end_tag('div');
-        
-        $o .= html_writer::tag('div', $list->summary, array('style'=>'margin:10px 0;'));
-        
-        $o .= html_writer::tag('div', voiceshadow_player($list->id));
-        
-        if (!empty($voiceshadow->{$name}))
-          $o .= html_writer::tag('div', "(".$voiceshadow->{$name}.")");
-        
-        $o .= html_writer::tag('div', html_writer::tag('small', date(get_string("timeformat1", "voiceshadow"), $list->time)), array("style" => "float:left;"));
-        
-        if ($list->userid == $USER->id || has_capability('mod/voiceshadow:teacher', $context)) {
-          if ($list->userid == $USER->id)
-            $editlink   = html_writer::link(new moodle_url('/mod/voiceshadow/view.php', array("id" => $id, "a" => "add", "fileid" => $list->id)), get_string("editlink", "voiceshadow"))." ";
-          else
-            $editlink   = "";
-            
-          if (has_capability('mod/voiceshadow:teacher', $context) || ($voiceshadow->resubmit == 1 && $list->userid == $USER->id)) 
-            $deletelink = html_writer::link(new moodle_url('/mod/voiceshadow/view.php', array("id" => $id, "act" => "deleteentry", "fileid" => $list->id)), get_string("delete", "voiceshadow"), array("onclick"=>"return confirm('".get_string("confim", "voiceshadow")."')"));
-          else
-            $deletelink = "";
-           
-          $o .= html_writer::tag('div', html_writer::tag('small', $editlink.$deletelink, array("style" => "margin: 2px 0 0 10px;")));
-        }
-        
-        $cell1 = new html_table_cell($o);
-        
-        //2-cell
-        $table2 = new html_table();
-        $table2->width = "100%";
-        
-        if (voiceshadow_is_ios()) {
-          $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("table2::cell1::pronunciation", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 1))));
-          $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("table2::cell2::fluency", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 2))));
-          $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("table2::cell3::content", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 3))));
-          $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("table2::cell4::organization", "voiceshadow", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 4))));
-          $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("table2::cell5::eye", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 5))));
-        } else {
-          $table2->head  = array(get_string("table2::cell1::pronunciation", "voiceshadow"), get_string("table2::cell2::fluency", "voiceshadow"), get_string("table2::cell3::content", "voiceshadow"), get_string("table2::cell4::organization", "voiceshadow"), get_string("table2::cell5::eye", "voiceshadow"));
-          //$table2->align = array ("center", "center", "center", "center", "center");
-          $table2->align = array ("center".get_string("table2::style", "voiceshadow"), "center".get_string("table2::style", "voiceshadow"), "center".get_string("table2::style", "voiceshadow"), "center".get_string("table2::style", "voiceshadow"), "center".get_string("table2::style", "voiceshadow"));
+    $alluserslist  = $DB->get_records("user", array(), $sort." ".$orderby);
+    
+    foreach($alluserslist as $k => $v) {
+      $lists = $DB->get_records ("voiceshadow_files", array("instance" => $id, "userid"=>$v->id), 'time DESC');
+              
+      foreach ($lists as $list) {
+          $name = "var".$list->var."text";
           
-          $table2->data[] = array (voiceshadow_set_rait($list->id, 1),
-                                   voiceshadow_set_rait($list->id, 2),
-                                   voiceshadow_set_rait($list->id, 3),
-                                   voiceshadow_set_rait($list->id, 4),
-                                   voiceshadow_set_rait($list->id, 5));
-        }
-        
-        //----Comment Box-----/
-        //if ($list->userid == $USER->id){
-        $chtml = "";
-        if($comments = $DB->get_records("voiceshadow_comments", array("fileid" => $list->id))){
-          foreach($comments as $comment){
-            $chtml .= html_writer::start_tag('div', array("style"=>"border:1px solid #333;margin:5px;text-align:left;padding:5px;"));
+          $userdata  = $DB->get_record("user", array("id" => $list->userid));
+          $picture   = $OUTPUT->user_picture($userdata, array('popup' => true));
+                  
+          $own = $DB->get_record("voiceshadow_ratings", array("fileid" => $list->id, "userid" => $list->userid));
+              
+          if (@empty($own->ratingrhythm)) @$own->ratingrhythm = get_string('norateyet', 'voiceshadow');
+          if (empty($own->ratingclear))  $own->ratingclear = get_string('norateyet', 'voiceshadow');
+          if (empty($own->ratingintonation)) $own->ratingintonation = get_string('norateyet', 'voiceshadow');
+          if (empty($own->ratingspeed)) $own->ratingspeed = get_string('norateyet', 'voiceshadow');
+          if (empty($own->ratingreproduction)) $own->ratingreproduction = get_string('norateyet', 'voiceshadow');
+              
+          //1-cell
+          $o = "";
+          $o .= html_writer::start_tag('div', array("style" => "text-align:left;margin:10px 0;"));
+          $o .= html_writer::tag('span', $picture);
+          $o .= html_writer::start_tag('span', array("style" => "margin: 8px;position: absolute;"));
+          $o .= html_writer::link(new moodle_url('/user/view.php', array("id" => $userdata->id, "course" => $cm->course)), fullname($userdata));
+          $o .= html_writer::end_tag('span');
+          $o .= html_writer::end_tag('div');
+          
+          $o .= html_writer::tag('div', $list->summary, array('style'=>'margin:10px 0;'));
+          
+          $o .= html_writer::tag('div', voiceshadow_player($list->id));
+          
+          if (!empty($voiceshadow->{$name}))
+            $o .= html_writer::tag('div', "(".$voiceshadow->{$name}.")");
+          
+          $o .= html_writer::tag('div', html_writer::tag('small', date(get_string("timeformat1", "voiceshadow"), $list->time)), array("style" => "float:left;"));
+          
+          if ($list->userid == $USER->id || has_capability('mod/voiceshadow:teacher', $context)) {
+            if ($list->userid == $USER->id)
+              $editlink   = html_writer::link(new moodle_url('/mod/voiceshadow/view.php', array("id" => $id, "a" => "add", "fileid" => $list->id)), get_string("editlink", "voiceshadow"))." ";
+            else
+              $editlink   = "";
+              
+            if (has_capability('mod/voiceshadow:teacher', $context) || ($voiceshadow->resubmit == 1 && $list->userid == $USER->id)) 
+              $deletelink = html_writer::link(new moodle_url('/mod/voiceshadow/view.php', array("id" => $id, "act" => "deleteentry", "fileid" => $list->id)), get_string("delete", "voiceshadow"), array("onclick"=>"return confirm('".get_string("confim", "voiceshadow")."')"));
+            else
+              $deletelink = "";
+             
+            $o .= html_writer::tag('div', html_writer::tag('small', $editlink.$deletelink, array("style" => "margin: 2px 0 0 10px;")));
+          }
+          
+          $cell1 = new html_table_cell($o);
+          
+          //2-cell
+          $table2 = new html_table();
+          $table2->width = "100%";
+          
+          if (voiceshadow_is_ios()) {
+            $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("table2::cell1::pronunciation", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 1))));
+            $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("table2::cell2::fluency", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 2))));
+            $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("table2::cell3::content", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 3))));
+            $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("table2::cell4::organization", "voiceshadow", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 4))));
+            $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("table2::cell5::eye", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 5))));
+          } else {
+            $table2->head  = array(get_string("table2::cell1::pronunciation", "voiceshadow"), get_string("table2::cell2::fluency", "voiceshadow"), get_string("table2::cell3::content", "voiceshadow"), get_string("table2::cell4::organization", "voiceshadow"), get_string("table2::cell5::eye", "voiceshadow"));
+            //$table2->align = array ("center", "center", "center", "center", "center");
+            $table2->align = array ("center".get_string("table2::style", "voiceshadow"), "center".get_string("table2::style", "voiceshadow"), "center".get_string("table2::style", "voiceshadow"), "center".get_string("table2::style", "voiceshadow"), "center".get_string("table2::style", "voiceshadow"));
             
-            $chtml .= html_writer::tag('div', $comment->summary, array('style'=>'margin:10px 0;'));
+            $table2->data[] = array (voiceshadow_set_rait($list->id, 1),
+                                     voiceshadow_set_rait($list->id, 2),
+                                     voiceshadow_set_rait($list->id, 3),
+                                     voiceshadow_set_rait($list->id, 4),
+                                     voiceshadow_set_rait($list->id, 5));
+          }
+          
+          //----Comment Box-----/
+          //if ($list->userid == $USER->id){
+          $chtml = "";
+          if($comments = $DB->get_records("voiceshadow_comments", array("fileid" => $list->id))){
+            foreach($comments as $comment){
+              $chtml .= html_writer::start_tag('div', array("style"=>"border:1px solid #333;margin:5px;text-align:left;padding:5px;"));
+              
+              $chtml .= html_writer::tag('div', $comment->summary, array('style'=>'margin:10px 0;'));
+              
+              //if (!empty($comment->itemid)) {
+              $chtml .= html_writer::tag('div', voiceshadow_player($comment->id, "voiceshadow_comments"));
+              //}
+              
+              $chtml .= html_writer::tag('div', html_writer::tag('small', date(get_string("timeformat1", "voiceshadow"), $comment->time)), array("style" => "float:left;"));
+              
+              $student = $DB->get_record("user", array("id" => $comment->userid));
+              $studentlink = html_writer::link(new moodle_url('/user/view.php', array("id" => $student->id, "course" => $cm->course)), fullname($student));
+              
+              //if ($comment->userid == $USER->id || has_capability('mod/voiceshadow:teacher', $context)) {
+                if (has_capability('mod/voiceshadow:teacher', $context) || ($voiceshadow->resubmit == 1 && $comment->userid == $USER->id)) {
+                  $deletelink = html_writer::link(new moodle_url('/mod/voiceshadow/view.php', array("id" => $id, "act" => "deletecomment", "fileid" => $comment->id)), get_string("delete", "voiceshadow"), array("onclick"=>"return confirm('".get_string("confim", "voiceshadow")."')"));
+                } else {
+                  $deletelink = "";
+                }
+                
+                if (has_capability('mod/voiceshadow:teacher', $context) && $comment->userid == $USER->id) {
+                  $editlink = html_writer::link(new moodle_url('/mod/voiceshadow/view.php', array("id" => $id, "a" => "add", "act" => "addcomment", "fileid" => $list->id, "commentid" => $comment->id)), get_string("editlink", "voiceshadow"));
+                } else {
+                  $editlink = "";
+                }
+             // }
+              
+              $chtml .= html_writer::tag('div', html_writer::tag('small', $studentlink . " " . $editlink . " " . $deletelink, array("style" => "margin: 2px 0 0 10px;")));
+              
+              $chtml .= html_writer::tag('div', NULL, array("style" => "clear:both"));
+              
+              $chtml .= html_writer::end_tag('div');
+            }
+          }
+          
+          if (has_capability('mod/voiceshadow:teacher', $context)) {
+            $addcommentlink = html_writer::tag('div', html_writer::link(new moodle_url('/mod/voiceshadow/view.php', array("id" => $id, "a" => "add", "act" => "addcomment", "fileid" => $list->id)), get_string("addcomment", "voiceshadow")));
+          } else {
+            $addcommentlink = "";
+          }
             
-            //if (!empty($comment->itemid)) {
-            $chtml .= html_writer::tag('div', voiceshadow_player($comment->id, "voiceshadow_comments"));
+            /*
+          } else
+            $addcomment = "";*/
+          //--------------------/
+          
+          if (voiceshadow_is_ios()) {
+            //if ($list->userid != $USER->id){
+            //  unset($table2->data);
             //}
             
-            $chtml .= html_writer::tag('div', html_writer::tag('small', date(get_string("timeformat1", "voiceshadow"), $comment->time)), array("style" => "float:left;"));
-            
-            $student = $DB->get_record("user", array("id" => $comment->userid));
-            $studentlink = html_writer::link(new moodle_url('/user/view.php', array("id" => $student->id, "course" => $cm->course)), fullname($student));
-            
-            //if ($comment->userid == $USER->id || has_capability('mod/voiceshadow:teacher', $context)) {
-              if (has_capability('mod/voiceshadow:teacher', $context) || ($voiceshadow->resubmit == 1 && $comment->userid == $USER->id)) {
-                $deletelink = html_writer::link(new moodle_url('/mod/voiceshadow/view.php', array("id" => $id, "act" => "deletecomment", "fileid" => $comment->id)), get_string("delete", "voiceshadow"), array("onclick"=>"return confirm('".get_string("confim", "voiceshadow")."')"));
-              } else {
-                $deletelink = "";
-              }
-              
-              if (has_capability('mod/voiceshadow:teacher', $context) && $comment->userid == $USER->id) {
-                $editlink = html_writer::link(new moodle_url('/mod/voiceshadow/view.php', array("id" => $id, "a" => "add", "act" => "addcomment", "fileid" => $list->id, "commentid" => $comment->id)), get_string("editlink", "voiceshadow"));
-              } else {
-                $editlink = "";
-              }
-           // }
-            
-            $chtml .= html_writer::tag('div', html_writer::tag('small', $studentlink . " " . $editlink . " " . $deletelink, array("style" => "margin: 2px 0 0 10px;")));
-            
-            $chtml .= html_writer::tag('div', NULL, array("style" => "clear:both"));
-            
-            $chtml .= html_writer::end_tag('div');
-          }
-        }
-        
-        if (has_capability('mod/voiceshadow:teacher', $context)) {
-          $addcommentlink = html_writer::tag('div', html_writer::link(new moodle_url('/mod/voiceshadow/view.php', array("id" => $id, "a" => "add", "act" => "addcomment", "fileid" => $list->id)), get_string("addcomment", "voiceshadow")));
-        } else {
-          $addcommentlink = "";
-        }
+            $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("cell3::peer", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 6))));
+            $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("cell4::teacher", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 7))));
           
-          /*
-        } else
-          $addcomment = "";*/
-        //--------------------/
-        
-        if (voiceshadow_is_ios()) {
-          //if ($list->userid != $USER->id){
-          //  unset($table2->data);
-          //}
-          
-          $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("cell3::peer", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 6))));
-          $table2->data[] = new html_table_row(array ( new html_table_cell(get_string("cell4::teacher", "voiceshadow")), new html_table_cell(voiceshadow_set_rait($list->id, 7))));
-        
-          $row = new html_table_row(array($cell1));
-          $table->data[] = $row;
-          
-          $cell2 = new html_table_cell(html_writer::table($table2) . $chtml . $addcommentlink);
-          $row = new html_table_row(array($cell2));
-          $table->data[] = $row;
-        } else {
-          //if ($list->userid == $USER->id)
+            $row = new html_table_row(array($cell1));
+            $table->data[] = $row;
+            
             $cell2 = new html_table_cell(html_writer::table($table2) . $chtml . $addcommentlink);
-          //else
-          //  $cell2 = new html_table_cell($chtml . $addcommentlink);
-          
-          //3-cell
-          $cell3 = new html_table_cell(voiceshadow_set_rait($list->id, 6));
-          
-          //4-cell
-          $cell4 = new html_table_cell(voiceshadow_set_rait($list->id, 7));
-          
-          
-          $cells = array($cell1, $cell2, $cell3, $cell4);
-          
-          $row = new html_table_row($cells);
-          
-          $table->data[] = $row;
-        }
+            $row = new html_table_row(array($cell2));
+            $table->data[] = $row;
+          } else {
+            //if ($list->userid == $USER->id)
+              $cell2 = new html_table_cell(html_writer::table($table2) . $chtml . $addcommentlink);
+            //else
+            //  $cell2 = new html_table_cell($chtml . $addcommentlink);
+            
+            //3-cell
+            $cell3 = new html_table_cell(voiceshadow_set_rait($list->id, 6));
+            
+            //4-cell
+            $cell4 = new html_table_cell(voiceshadow_set_rait($list->id, 7));
+            
+            
+            $cells = array($cell1, $cell2, $cell3, $cell4);
+            
+            $row = new html_table_row($cells);
+            
+            $table->data[] = $row;
+          }
+      }
     }
     
     if ($voiceshadow->grademethod == "rubrics") {
