@@ -406,6 +406,8 @@ if ($a == "list") {
                 
                 $mform    =& $this->_form;
                 
+                $mform->disable_form_change_checker();
+                
                 //--------------Checking Embed code---------//
                 if (!empty($voiceshadow->embedvideo)) {
                   $mform->addElement('header', 'Embed', get_string('embedcode', 'voiceshadow')); 
