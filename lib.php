@@ -581,8 +581,11 @@ function voiceshadow_player($ids, $table = "voiceshadow_files"){
             }
           }
         }
-
-        return get_string('pleasewaitinprocess', 'voiceshadow').$o;
+        
+        if ($table != "voiceshadow_comments")
+          return get_string('pleasewaitinprocess', 'voiceshadow').$o;
+        else
+          return "";
       } else {
         if ($item = $DB->get_record("files", array("id" => $data->itemid))) {
           //$f = get_file_storage();
