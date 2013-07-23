@@ -416,7 +416,7 @@ if ($a == "list") {
                 //------------------------------------------//
 
                 //--------------Uploadd MP3 ----------------//
-                if (!voiceshadow_is_ios()) {
+                if (!voiceshadow_is_ios() && voiceshadow_get_browser() != 'android') {
                   $filepickeroptions = array();
                   //$filepickeroptions['filetypes'] = array('.mp3','.mov','.mp4','.m4a');
                   $filepickeroptions['maxbytes']  = get_max_upload_file_size($voiceshadow->maxbytes);
@@ -444,7 +444,7 @@ if ($a == "list") {
                       <input type="radio" name="selectaudiomodel" value="'.$i.'" class="selectaudiomodel" id="id_selectaudiomodel_'.$i.'" style="float: left;margin: 0 20px 0 0;" '.$checked.' data-url="voiceshadow://?link='.$CFG->wwwroot.'&id='.$id.'&uid='.$USER->id.'&time='.$time.'&var='.$i.'&type=voiceshadow" />
                       ';
                       
-                      if (!voiceshadow_is_ios()) {
+                      if (!voiceshadow_is_ios() && voiceshadow_get_browser() != 'android') {
                         $o .= html_writer::script('var fn = function() {var att = { data:"'.(new moodle_url("/mod/voiceshadow/js/mp3player.swf")).'", width:"90", height:"15" };var par = { flashvars:"src='.$link.'" };var id = "audio_'.$voiceshadow->{$name}.'";var myObject = swfobject.createSWF(att, par, id);};swfobject.addDomLoadEvent(fn);');
                         $o .= '<div style="float:left;"><div id="audio_'.$voiceshadow->{$name}.'"><a href="'.$link.'">audio</a></div></div><label for="id_selectaudiomodel_'.$i.'" style="float: left;margin-left: 20px;font-size: 15px;">'.$voiceshadow->{$nametext}.'</label><div style="clear:both;"></div>';
                       } else {
@@ -463,7 +463,7 @@ if ($a == "list") {
                 //-------------- Record ----------------//
                 $mediadata = "";
                 
-                if (voiceshadow_is_ios()) {
+                if (voiceshadow_is_ios()) { // || voiceshadow_get_browser() == 'android'
                   $mediadata .= html_writer::start_tag("h3", array("style" => "padding: 0 20px;"));
                   $mediadata .= html_writer::start_tag("a", array("href" => 'voiceshadow://?link='.$CFG->wwwroot.'&id='.$id.'&uid='.$USER->id.'&time='.$time.'&var=1&type=voiceshadow', "id"=>"id_recoring_link",
                                                                   "onclick" => 'formsubmit(this.href)'));
