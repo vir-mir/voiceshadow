@@ -21,6 +21,7 @@ $string['norateyet'] = 'Not rated yet';
 $string['postsubmited'] = 'Your voice was submitted';
 $string['commentsubmited'] = 'Your comment was submmited';
 $string['pleasewaitinprocess'] = 'Conversion in Process';
+$string['pleaseerrorinprocess'] = 'Conversion error';
 $string['recordvoice'] = 'Record voice';
 $string['recordvideo'] = 'Record video';
 $string['recordvideomedium'] = 'Record video (Medium quality)';
