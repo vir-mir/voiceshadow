@@ -45,6 +45,7 @@ $string['voiceshadow_viewhistory'] = 'View my recordings';
 $string['voiceshadow_by_student'] = 'View recordings by student';
 $string['embedcode'] = 'Video';
 $string['submissions'] = 'Submissions';
+$string['usespeechtotext'] = 'Use speech to text';
 
 $string['cell1::student'] = 'Student';
 $string['cell2::'] = 'self-evaluation';

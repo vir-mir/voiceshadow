@@ -3,13 +3,15 @@
 
     require_once '../../config.php';
     require_once 'lib.php';
+    
+    $filename                     = optional_param('name', NULL, PARAM_TEXT);
+    $file                         = optional_param('audio', NULL, PARAM_TEXT);
+    $p                            = optional_param('p', NULL, PARAM_TEXT);
+    
+    $p = json_decode(urldecode($p));
 
-    $id                           = optional_param('p1', 0, PARAM_INT);
-    $userid                       = optional_param('p2', 0, PARAM_INT);
-    $fid                          = optional_param('p3', 0, PARAM_INT);
-    $filename                     = optional_param('p4', NULL, PARAM_TEXT);
-    $requestid                    = optional_param('requestid', NULL, PARAM_INT);
-    $file                         = optional_param('filedata', NULL, PARAM_TEXT);
+    $id                           = $p->id;
+    $userid                       = $p->userid;
     
     $file = base64_decode($file);
     
@@ -35,6 +37,25 @@
       $file_record->filearea  = 'public';
     }
     
+    if(isset($p->itemid) && is_numeric($p->itemid))
+      $fid                    = $p->itemid;
+    else {
+      if (!empty($id)) {
+        if (!$data = $DB->get_record_sql("SELECT itemid FROM {files} WHERE component='mod_voiceshadow' AND filearea='private' ORDER BY itemid DESC LIMIT 1", array($context->id))) { //AND contextid=?
+            $fid = 1;
+        } else {
+            $fid = $data->itemid + 1;
+        }
+      } else {
+        if (!$data = $DB->get_record_sql("SELECT itemid FROM {files} WHERE component='user' AND filearea='public' ORDER BY itemid DESC LIMIT 1", array($context->id))) {
+            $fid = 1;
+        } else {
+            $fid = $data->itemid + 1;
+        }
+      }
+    }
+    
+    
     $file_record->contextid = $context->id;
     $file_record->userid    = $userid;
     $file_record->filepath  = "/";
@@ -44,7 +65,6 @@
     $file_record->source    = '';
     $file_record->filename  = $filename.".mp3";
     
-
     $to = $CFG->dataroot."/temp/".$filename.".mp3";
 
     file_put_contents($to, $file);
@@ -53,12 +73,10 @@
     
     $json = array("id" => $itemid->get_id());
     
-    header("Content-type: text/xml");
-
-    $xml_output = "<?xml version=\"1.0\"?>
-    <result requestid='{$requestid}'>success<error>audio.mp3</error></result>";
-
-    echo $xml_output;
+    $item = $DB->get_record("files", array("id"=>$itemid->get_id()));
+    
+    echo json_encode(array("id"=>$fid, "url"=>"/pluginfile.php/".$item->contextid."/mod_voiceshadow/".$id."/".$item->id."/".$item->filename));
+    //echo json_encode(array("id"=>$itemid->get_id(), "url"=>(new moodle_url("/mod/voiceshadow/js/recorder.swf"))));
 
     unlink($to);
 

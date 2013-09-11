@@ -11,6 +11,7 @@ $id                     = optional_param('id', 0, PARAM_INT);
 $ids                    = optional_param('ids', 0, PARAM_INT); 
 $a                      = optional_param('a', 'list', PARAM_TEXT);  
 $summary                = optional_param_array('summary', NULL, PARAM_TEXT);  
+$speechtext             = optional_param('speechtext', NULL, PARAM_TEXT);  
 $filename               = optional_param('filename', NULL, PARAM_TEXT);  
 $fileid                 = optional_param('fileid', 0, PARAM_INT);
 $submitfile             = optional_param('submitfile', 0, PARAM_INT); 
@@ -20,6 +21,7 @@ $act                    = optional_param('act', NULL, PARAM_CLEAN);
 $delfilename            = optional_param('delfilename', NULL, PARAM_TEXT); 
 $sort                   = optional_param('sort', 'firstname', PARAM_CLEAN); 
 $orderby                = optional_param('orderby', 'ASC', PARAM_CLEAN); 
+    
     
     
 if (is_array($summary)) $summary = $summary['text'];
@@ -68,6 +70,7 @@ if ($a == 'add' && $act == 'newinstance') {
     $data->instance      = $id;
     $data->userid        = $USER->id;
     $data->summary       = $summary;
+    $data->speechtext    = $speechtext;
     $data->filename      = $filename;
     $data->var           = $selectaudiomodel;
     $data->time          = time();
@@ -112,6 +115,7 @@ if ($a == 'add' && $act == 'addcomment' && isset($summary)) {
     $data->instance      = $id;
     $data->userid        = $USER->id;
     $data->summary       = $summary;
+    $data->speechtext    = $speechtext;
     $data->filename      = $filename;
     $data->fileid        = $fileid;
     $data->time          = time();
@@ -233,6 +237,9 @@ if ($a == "list") {
           
           if (!empty($voiceshadow->{$name}))
             $o .= html_writer::tag('div', "(".$voiceshadow->{$name}.")");
+          
+          if (!empty($list->speechtext))
+            $o .= html_writer::tag('div', "Speech text: ".$list->speechtext."");
           
           $o .= html_writer::tag('div', html_writer::tag('small', date(get_string("timeformat1", "voiceshadow"), $list->time)), array("style" => "float:left;"));
           
@@ -444,11 +451,11 @@ if ($a == "list") {
                       <input type="radio" name="selectaudiomodel" value="'.$i.'" class="selectaudiomodel" id="id_selectaudiomodel_'.$i.'" style="float: left;margin: 0 20px 0 0;" '.$checked.' data-url="voiceshadow://?link='.$CFG->wwwroot.'&id='.$id.'&uid='.$USER->id.'&time='.$time.'&var='.$i.'&type=voiceshadow" />
                       ';
                       
-                      if (!voiceshadow_is_ios() && voiceshadow_get_browser() != 'android') {
+                      if (voiceshadow_is_ios() || voiceshadow_get_browser() == 'chrome' || voiceshadow_get_browser() == 'android') {
+                        $o .= '<div style="float:left;"><audio src="'.$link.'" id="audio_'.$voiceshadow->{$name}.'" controls="controls"><a href="'.$link.'">audio</a></audio></div><label for="id_selectaudiomodel_'.$i.'" style="float: left;margin-left: 20px;font-size: 15px;">'.$voiceshadow->{$nametext}.'</label><div style="clear:both;"></div>';
+                      } else {
                         $o .= html_writer::script('var fn = function() {var att = { data:"'.(new moodle_url("/mod/voiceshadow/js/mp3player.swf")).'", width:"90", height:"15" };var par = { flashvars:"src='.$link.'" };var id = "audio_'.$voiceshadow->{$name}.'";var myObject = swfobject.createSWF(att, par, id);};swfobject.addDomLoadEvent(fn);');
                         $o .= '<div style="float:left;"><div id="audio_'.$voiceshadow->{$name}.'"><a href="'.$link.'">audio</a></div></div><label for="id_selectaudiomodel_'.$i.'" style="float: left;margin-left: 20px;font-size: 15px;">'.$voiceshadow->{$nametext}.'</label><div style="clear:both;"></div>';
-                      } else {
-                        $o .= '<div style="float:left;"><audio src="'.$link.'" id="audio_'.$voiceshadow->{$name}.'" controls="controls"><a href="'.$link.'">audio</a></audio></div><label for="id_selectaudiomodel_'.$i.'" style="float: left;margin-left: 20px;font-size: 15px;">'.$voiceshadow->{$nametext}.'</label><div style="clear:both;"></div>';
                       }
                       
                       $o  .= '</div>';
@@ -476,14 +483,48 @@ if ($a == "list") {
                 } else {
                   $filename = str_replace(" ", "_", $USER->username)."_".date("Ymd_Hi", $time);
                   
-                  $mediadata  = html_writer::script('var fn = function() {var att = { data:"'.(new moodle_url("/mod/voiceshadow/js/recorder.swf")).'", width:"350", height:"200"};var par = { flashvars:"rate=44&gain=50&prefdevice=&loopback=no&echosupression=yes&silencelevel=0&updatecontrol=poodll_recorded_file&callbackjs=poodllcallback&posturl='.(new moodle_url("/mod/voiceshadow/uploadmp3.php")).'&p1='.$id.'&p2='.$USER->id.'&p3="+$(\'#id_submitfile\').attr(\'value\')+"&p4='.$filename.'&autosubmit=true&debug=false&lzproxied=false" };var id = "mp3_flash_recorder";var myObject = swfobject.createSWF(att, par, id);};swfobject.addDomLoadEvent(fn);');
-                  $mediadata .= '<div id="mp3_flash_recorder"></div><input name="poodll_recorded_file" type="hidden" value="" id="poodll_recorded_file" />';
+                  /*$mediadata  = html_writer::script('var fn = function() {var att = { data:"'.(new moodle_url("/mod/voiceshadow/js/recorder.swf")).'", width:"350", height:"200"};var par = { flashvars:"rate=44&gain=50&prefdevice=&loopback=no&echosupression=yes&silencelevel=0&updatecontrol=poodll_recorded_file&callbackjs=poodllcallback&posturl='.(new moodle_url("/mod/voiceshadow/uploadmp3.php")).'&p1='.$id.'&p2='.$USER->id.'&p3="+$(\'#id_submitfile\').attr(\'value\')+"&p4='.$filename.'&autosubmit=true&debug=false&lzproxied=false" };var id = "mp3_flash_recorder";var myObject = swfobject.createSWF(att, par, id);};swfobject.addDomLoadEvent(fn);');
+                  $mediadata .= '<div id="mp3_flash_recorder"></div><input name="poodll_recorded_file" type="hidden" value="" id="poodll_recorded_file" />';*/
+                  
+                  
 
     /*echo html_writer::script('
 function poodllcallback(args){
 	console.log ("poodllcallback:" + args[0] + ":" + args[1] + ":" + args[2] + ":" + args[3] + ":" + args[4]);
 }
 ');*/
+
+                  
+                  if ($voiceshadow->speechtotext == 1){
+                    $speechcode = 'flashvars.speech = "'.urlencode("http://netcourse.org/pr/flashrecorder/speechtotext.php").'";';
+                    $speechcallbackcode = '<div style="margin-bottom: 10px;width: 275px;padding: 10px;border: 1px dashed #666;background-color: #eeefff;">\'+e.text+\'</div>';
+                  } else {
+                    $speechcode = "";
+                    $speechcallbackcode = '';
+                  }
+
+                  $mediadata  = html_writer::script('var flashvars={};flashvars.gain=35;flashvars.rate=44;flashvars.call="callbackjs";flashvars.name = "'.$filename.'";flashvars.p = "'.urlencode(json_encode(array("id"=>$id, "userid"=>$USER->id))).'";flashvars.url = "'.urlencode(new moodle_url("/mod/voiceshadow/uploadmp3.php")).'";'.$speechcode.'swfobject.embedSWF("'.(new moodle_url("/mod/voiceshadow/js/recorder.swf")).'", "mp3_flash_recorder", "220", "200", "9.0.0", "expressInstall.swf", flashvars);');
+                  $mediadata .= '<div id="mp3_flash_recorder"></div><div id="mp3_flash_records" style="margin:20px 0;"></div>';
+                  
+                  echo html_writer::script('
+function chooserecord(e){
+  $(".choosingrecord").html(\'<img src="'.(new moodle_url("/mod/voiceshadow/img/right-arrow-gray.png")).'" style="margin-top: 6px;"/>\');
+  $(e).html(\'<img src="'.(new moodle_url("/mod/voiceshadow/img/right-arrow.png")).'" style="margin-top: 6px;"/>\');
+  $("#id_submitfile").val($(e).attr("data-url"));
+  $("#id_speechtext").val($(e).attr("data-text"));
+}
+function callbackjs(e){
+  $("#id_speechtext").val(""+e.text+"");
+  $(".choosingrecord").html(\'<img src="'.(new moodle_url("/mod/voiceshadow/img/right-arrow-gray.png")).'" style="margin-top: 6px;"/>\');
+  obj = JSON.parse(e.data);
+  $("#mp3_flash_records").prepend(\'<div class="recordings"><div class="choosingrecord" style="float:left;cursor: pointer;" data-url="\'+obj.id+\'" data-text="\'+e.text+\'" onclick="chooserecord(this)"><img src="'.(new moodle_url("/mod/voiceshadow/img/right-arrow.png")).'" style="margin-top: 6px;"/></div><div style="float:left;"><div><audio controls id="peviewaudio" oncanplay="this.volume=0.5"><source src="'.$CFG->wwwroot.'\'+obj.url+\'" preload="auto" type="audio/mpeg"></audio></div>'.$speechcallbackcode.'</div><div style="clear:both;"></div></div>\');
+  $("#id_submitfile").val(obj.id);
+
+  if($("#mp3_flash_records > div").size() >= 4) {
+    $("#mp3_flash_records > div").last().remove();
+  }
+}
+');
                   
                 }
                 
@@ -502,6 +543,9 @@ function poodllcallback(args){
                   $mform->addelEment('hidden', 'fileid', $fileid);
                 } else
                   $mform->addelEment('hidden', 'act', 'newinstance');
+                  
+                if ($voiceshadow->speechtotext == 1)
+                  $mform->addelEment('hidden', 'speechtext', 'null', array('id'=>'id_speechtext'));
                 //-------------- Record -------END------//
                 
 
@@ -527,6 +571,7 @@ function poodllcallback(args){
             });
             </script>');
                 
+                $mform->addRule('summary', null, 'required', null, 'client');
                 
                 $this->add_action_buttons(false, $submitlabel = get_string("saverecording", "voiceshadow"));
             }

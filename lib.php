@@ -595,12 +595,12 @@ function voiceshadow_player($ids, $table = "voiceshadow_files"){
           //$file = $f->get_file_instance($item);
           
           $link = new moodle_url("/pluginfile.php/".$item->contextid."/mod_voiceshadow/".$ids."/".$data->itemid."/".$item->filename);
-          
-          if (voiceshadow_is_ios() || voiceshadow_get_browser() == 'android') {
+
+          if (voiceshadow_is_ios() || voiceshadow_get_browser() == 'chrome' || voiceshadow_get_browser() == 'android') {
               if (in_array($item->mimetype, json_decode(VOICESHADOW_AUDIOTYPES))) {
                 $o  = "";
                 $o .= html_writer::start_tag('div', array("id" => "html5-player-".$ids));
-                $o .= html_writer::start_tag('audio', array("id" => "html5-audioplayer-".$ids, "controls" => "controls", "src" => $link));
+                $o .= html_writer::start_tag('audio', array("id" => "html5-audioplayer-".$ids, "controls" => "controls", "src" => $link, "oncanplay"=>"this.volume=0.5"));
                 $o .= html_writer::link($link, get_string("audio", "voiceshadow"));
                 $o .= html_writer::end_tag('audio');
                 $o .= html_writer::end_tag('div');
@@ -678,7 +678,11 @@ function voiceshadow_is_ios(){
 function voiceshadow_getfile($itemid){
   global $DB, $CFG;
   
-  if ($file = $DB->get_record_sql("SELECT * FROM {files} WHERE `itemid`=? AND `filesize` != 0", array($itemid))){
+  if ($file = $DB->get_record_sql("SELECT * FROM {files} WHERE `itemid`=? AND `filesize` != 0 AND `component` = 'mod_voiceshadow' AND `filearea` = 'private'", array($itemid))) {
+  } else if ($file = $DB->get_record_sql("SELECT * FROM {files} WHERE `itemid`=? AND `filesize` != 0 AND `component` = 'user' AND `filearea` = 'public'", array($itemid))) {
+  }
+  
+  if ($file){
     $contenthash = $file->contenthash;
     $l1 = $contenthash[0].$contenthash[1];
     $l2 = $contenthash[2].$contenthash[3];

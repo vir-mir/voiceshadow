@@ -38,6 +38,7 @@ class mod_voiceshadow_mod_form extends moodleform_mod {
         $ynoptions = array( 0 => get_string('no'), 1 => get_string('yes'));
 
         $mform->addElement('select', 'preventlate', get_string('preventlate', 'assignment'), $ynoptions);
+        $mform->addElement('select', 'speechtotext', get_string('usespeechtotext', 'voiceshadow'), $ynoptions);
         $mform->setDefault('preventlate', 0);
         
         
@@ -65,8 +66,13 @@ class mod_voiceshadow_mod_form extends moodleform_mod {
           
           $mform->addElement('filepicker', 'submitfile_'.$i, get_string('uploadmp3', 'voiceshadow'), null, $filepickeroptions);
           
+          /*
           $mediadatavoice  = html_writer::script('var fn = function() {var att = { data:"'.(new moodle_url("/mod/voiceshadow/js/recorder.swf")).'", width:"350", height:"200"};var par = { flashvars:"rate=44&gain=50&prefdevice=&loopback=no&echosupression=yes&silencelevel=0&updatecontrol=poodll_recorded_file&callbackjs=poodllcallback&posturl='.(new moodle_url("/mod/voiceshadow/uploadmp3.php")).'&p1='.$update.'&p2='.$USER->id.'&p3="+$(\'#id_submitfile_'.$i.'\').attr(\'value\')+"&p4='.$filename.'&autosubmit=true&debug=false&lzproxied=false" };var id = "mp3_flash_recorder_'.$i.'";var myObject = swfobject.createSWF(att, par, id);};swfobject.addDomLoadEvent(fn);function poodllcallback(args){console.log(args);}');
           $mediadatavoice .= '<div id="mp3_flash_header_recorder_'.$i.'" style="display:none"><div id="mp3_flash_recorder_'.$i.'"></div><div>';
+          */
+          
+          $mediadatavoice  = html_writer::script('var flashvars = {};flashvars.gain=35;flashvars.rate=44;flashvars.name = "'.$filename.'";flashvars.p = "'.str_replace("IIIII",'"+$(\'#id_submitfile_'.$i.'\').attr(\'value\')+"', urlencode(json_encode(array("id"=>$update, "userid"=>$USER->id, "itemid"=>"IIIII")))).'";flashvars.url = "'.urlencode(new moodle_url("/mod/voiceshadow/uploadmp3.php")).'";swfobject.embedSWF("'.(new moodle_url("/mod/voiceshadow/js/recorder.swf")).'", "mp3_flash_record_'.$i.'", "220", "200", "9.0.0", "expressInstall.swf", flashvars);');
+          $mediadatavoice .= '<div id="mp3_flash_header_recorder_'.$i.'" style="display:none"><div id="mp3_flash_record_'.$i.'" style="margin:20px 0;"></div><div>';
 
           $mform->addelEment('hidden', 'filename_'.$i, $filename);
           $mform->addElement('html', $mediadatavoice);
