@@ -17,7 +17,6 @@ define('VOICESHADOW_COUNT_LETTERS', 2);
 
 function voiceshadow_add_instance($voiceshadow) {
     global $USER, $DB, $CFG;
-    
     for($i=1;$i<=5;$i++) {
       $name1 = "submitfile_{$i}";
       $name2 = "var{$i}";
@@ -680,6 +679,8 @@ function voiceshadow_getfile($itemid){
   
   if ($file = $DB->get_record_sql("SELECT * FROM {files} WHERE `itemid`=? AND `filesize` != 0 AND `component` = 'mod_voiceshadow' AND `filearea` = 'private'", array($itemid))) {
   } else if ($file = $DB->get_record_sql("SELECT * FROM {files} WHERE `itemid`=? AND `filesize` != 0 AND `component` = 'user' AND `filearea` = 'public'", array($itemid))) {
+  } else if ($file = $DB->get_record_sql("SELECT * FROM {files} WHERE `itemid`=? AND `filesize` != 0 AND `component` = 'user' AND `filearea` = 'draft'", array($itemid))) {
+    $DB->set_field("files", "filearea", "public", array("itemid"=>$itemid));
   }
   
   if ($file){
