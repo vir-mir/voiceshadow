@@ -21,7 +21,8 @@ $act                    = optional_param('act', NULL, PARAM_CLEAN);
 $delfilename            = optional_param('delfilename', NULL, PARAM_TEXT); 
 $sort                   = optional_param('sort', 'firstname', PARAM_CLEAN); 
 $orderby                = optional_param('orderby', 'ASC', PARAM_CLEAN); 
-    
+$page                   = optional_param('page', 0, PARAM_INT);
+$perpage                = optional_param('perpage', 10, PARAM_INT);
     
     
 if (is_array($summary)) $summary = $summary['text'];
@@ -203,10 +204,10 @@ if ($a == "list") {
     }
     
     
-    $alluserslist  = $DB->get_records("user", array(), $sort." ".$orderby);
+    //$alluserslist  = $DB->get_records("user", array(), $sort." ".$orderby);
     
-    foreach($alluserslist as $k => $v) {
-      $lists = $DB->get_records ("voiceshadow_files", array("instance" => $id, "userid"=>$v->id), 'time DESC');
+    //foreach($alluserslist as $k => $v) {
+      $lists = $DB->get_records ("voiceshadow_files", array("instance" => $id), 'time DESC');
               
       foreach ($lists as $list) {
           $name = "var".$list->var."text";
@@ -358,6 +359,7 @@ if ($a == "list") {
             //4-cell
             $cell4 = new html_table_cell(voiceshadow_set_rait($list->id, 7));
             
+            $cell1->sortdata = fullname($userdata);
             
             $cells = array($cell1, $cell2, $cell3, $cell4);
             
@@ -366,15 +368,30 @@ if ($a == "list") {
             $table->data[] = $row;
           }
       }
-    }
+    //}
     
     if ($voiceshadow->grademethod == "rubrics") {
       echo html_writer::start_tag('div');
       echo html_writer::link(new moodle_url('/mod/voiceshadow/submissions.php', array("id" => $id)), get_string("rubrics", "voiceshadow"));
       echo html_writer::end_tag('div');
     }
+    
+    $totalpages = count($table->data);
+    
+    $table->data = voiceshadow_sort_table_data ($table->data, $titlesarray, $orderby, $sort, $page, $perpage);
    
-    echo html_writer::table($table);
+    //echo html_writer::table($table);
+    
+    //list($totalcount, $table->data, $startrec, $finishrec, $options["page"]) = voiceshadow_get_pages($table->data, $page, $perpage);
+    
+    $alinkpadding     = new moodle_url("/mod/voiceshadow/view.php", array("id"=>$id, "sort"=>$sort, "orderby"=>$orderby));
+    
+    echo $OUTPUT->render(new paging_bar($totalpages, $page, $perpage, $alinkpadding));
+            
+    if ($table)
+        echo html_writer::table($table);
+            
+    echo $OUTPUT->render(new paging_bar($totalpages, $page, $perpage, $alinkpadding));
         
     echo html_writer::script('
  $(document).ready(function() {

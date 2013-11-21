@@ -52,7 +52,11 @@ function voiceshadow_update_instance($voiceshadow) {
           
           $DB->set_field("files", "filearea", "public", array("id"=>$file->id));
           $DB->set_field("files", "filearea", "public", array("id"=>($file->id + 1)));
+        } else {
+          $voiceshadow->{$name2} = 0;
         }
+      } else {
+        $voiceshadow->{$name2} = 0;
       }
     }
 
@@ -325,7 +329,7 @@ function voiceshadow_runExternal( $cmd, &$code ) {
 }
 
 
-function voiceshadow_sort_table_data ($data, $titlesarray, $orderby, $sort) {
+function voiceshadow_sort_table_data ($data, $titlesarray, $orderby, $sort, $page, $perpage) {
     global $USER, $CFG;
 
     $j = 0;
@@ -341,23 +345,18 @@ function voiceshadow_sort_table_data ($data, $titlesarray, $orderby, $sort) {
     }
 
     $i = 0;
+    
+    $newarray = array();
 
     foreach ($data as $datakey => $datavalue) {
-        if (!is_array($datavalue[$orderkey])) {
-            $key = $datavalue[$orderkey];
-        }  else  {
-            $key = $datavalue[$orderkey][1];
-        }
+        if (isset($datavalue->cells[$orderkey]->sortdata))
+          $key = $datavalue->cells[$orderkey]->sortdata;
+        else
+          $key = $datavalue->cells[$orderkey]->text;
 
-        for ($j=0; $j < count($datavalue); $j++) {
-            if (!is_array($datavalue[$j])) {
-                $newarray[(string)$key][$i][$j] = $datavalue[$j];
-            }  else  {
-                $newarray[(string)$key][$i][$j] = $datavalue[$j][0];
-            }
-        }
+        $newarray[(string)$key][$i] = $datakey;
         
-        $i ++;
+        $i++;
     }
     
     if (empty($orderby) || $orderby == "ASC") {
@@ -368,17 +367,17 @@ function voiceshadow_sort_table_data ($data, $titlesarray, $orderby, $sort) {
     
     reset($newarray);
     
+    $newdata = array();
+    
     foreach ($newarray as $newarray_) {
         foreach ($newarray_ as $newarray__) {
-            $newarraynew = array ();
-            foreach ($newarray__ as $newarray___) {
-                $newarraynew[] = $newarray___;
-            }
-            $finaldata[] = $newarraynew;
+            $newdata[] = $data[$newarray__];
         }
     }
     
-    return $finaldata;
+    $newdata = array_chunk($newdata, $perpage, true);
+    
+    return $newdata[$page];
 }
 
 
