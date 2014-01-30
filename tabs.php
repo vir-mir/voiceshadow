@@ -20,9 +20,20 @@
     $inactive = array();
 
     $row[]  = new tabobject('list', new moodle_url('/mod/voiceshadow/view.php', array('id'=>$id)), get_string('voiceshadow_list', 'voiceshadow'));
+   
+    $showaddbutton = 1;
+    
+    /*
+    if ($voiceshadow->allowmultiple > 0) {
+      $data = $DB->count_records("voiceshadow_files", array("instance"=>$id, "userid"=>$USER->id));
+      if ($data >= $voiceshadow->allowmultiple)
+        $showaddbutton = 0;
+    }
+    */
     
     if ($voiceshadow->timedue == 0 || ($voiceshadow->timedue > 0 && time() < $voiceshadow->timedue) || $voiceshadow->preventlate == 1)
-      $row[]  = new tabobject('add', new moodle_url('/mod/voiceshadow/view.php', array('id'=>$id, 'a'=>'add')), get_string('voiceshadow_add_record', 'voiceshadow'));
+      if ($showaddbutton == 1)
+        $row[]  = new tabobject('add', new moodle_url('/mod/voiceshadow/view.php', array('id'=>$id, 'a'=>'add')), get_string('voiceshadow_add_record', 'voiceshadow'));
     
     
     $row[]  = new tabobject('history', new moodle_url('/mod/voiceshadow/viewhistory.php', array('id'=>$id ,'ids'=>$USER->id, 'a'=>'history')), get_string('voiceshadow_viewhistory', 'voiceshadow'));

@@ -278,4 +278,5 @@ $string['grademethod'] = 'Grading method';
 
 $string['tocreateaslideshow'] = 'Select the number of model sounds to upload';
 $string['vartext'] = 'Audio name';
+$string['allowmultiple'] = 'Allow multiple recordings';
 

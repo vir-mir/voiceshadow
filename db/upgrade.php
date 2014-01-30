@@ -19,9 +19,26 @@
 
 function xmldb_voiceshadow_upgrade($oldversion=0) {
 
-    global $CFG, $THEME, $db;
+    global $CFG, $THEME, $DB;
 
     $result = true;
+    
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2013030200) {
+        $table = new xmldb_table('voiceshadow');
+        $field = new xmldb_field('allowmultiple', XMLDB_TYPE_INTEGER, '2', null,
+                                 XMLDB_NOTNULL, null, '0', 'emailteachers');
+
+        // Conditionally launch add field requiresubmissionstatement.
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Assign savepoint reached.
+        upgrade_mod_savepoint(true, 2013030200, 'voiceshadow');
+    }
 
     return $result;
 }

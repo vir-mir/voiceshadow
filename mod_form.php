@@ -36,10 +36,13 @@ class mod_voiceshadow_mod_form extends moodleform_mod {
         $mform->setDefault('timedue', time()+7*24*3600);
 
         $ynoptions = array( 0 => get_string('no'), 1 => get_string('yes'));
+        $allowmultiple = array( 1 => "1", 2 => "2", 3 => "3", 4 => "4", 5 => "5");
 
         $mform->addElement('select', 'preventlate', get_string('preventlate', 'assignment'), $ynoptions);
         $mform->addElement('select', 'speechtotext', get_string('usespeechtotext', 'voiceshadow'), $ynoptions);
         $mform->setDefault('preventlate', 0);
+        $mform->addElement('select', 'allowmultiple', get_string('allowmultiple', 'voiceshadow'), $allowmultiple);
+        $mform->setDefault('allowmultiple', 3);
         
         
         $mform->addElement('select', 'grade', get_string('grade'), array('1'=>'1', '2'=>'2', '3'=>'3', '4'=>'4', '5'=>'5'));

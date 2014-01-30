@@ -537,7 +537,7 @@ function callbackjs(e){
   $("#mp3_flash_records").prepend(\'<div class="recordings"><div class="choosingrecord" style="float:left;cursor: pointer;" data-url="\'+obj.id+\'" data-text="\'+e.text+\'" onclick="chooserecord(this)"><img src="'.(new moodle_url("/mod/voiceshadow/img/right-arrow.png")).'" style="margin-top: 6px;"/></div><div style="float:left;"><div><audio controls id="peviewaudio" oncanplay="this.volume=0.5"><source src="'.$CFG->wwwroot.'\'+obj.url+\'" preload="auto" type="audio/mpeg"></audio></div>'.$speechcallbackcode.'</div><div style="clear:both;"></div></div>\');
   $("#id_submitfile").val(obj.id);
 
-  if($("#mp3_flash_records > div").size() >= 4) {
+  if($("#mp3_flash_records > div").size() >= '.($voiceshadow->allowmultiple+1).') {
     $("#mp3_flash_records > div").last().remove();
   }
 }
@@ -588,7 +588,7 @@ function callbackjs(e){
             });
             </script>');
                 
-                $mform->addRule('summary', null, 'required', null, 'client');
+                //$mform->addRule('summary', null, 'required', null, 'client');
                 
                 $this->add_action_buttons(false, $submitlabel = get_string("saverecording", "voiceshadow"));
             }
