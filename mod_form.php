@@ -30,15 +30,15 @@ class mod_voiceshadow_mod_form extends moodleform_mod {
         //$mform->addElement('editor', 'embedvideo', get_string('embedvideo', 'voiceshadow'));
         //$mform->setType('embedvideo', PARAM_RAW);
         
-        $mform->addElement('date_time_selector', 'timeavailable', get_string('availabledate', 'assignment'), array('optional'=>true));
+        $mform->addElement('date_time_selector', 'timeavailable', get_string('availabledate', 'voiceshadow'), array('optional'=>true));
         $mform->setDefault('timeavailable', time());
-        $mform->addElement('date_time_selector', 'timedue', get_string('duedate', 'assignment'), array('optional'=>true));
+        $mform->addElement('date_time_selector', 'timedue', get_string('duedate', 'voiceshadow'), array('optional'=>true));
         $mform->setDefault('timedue', time()+7*24*3600);
 
         $ynoptions = array( 0 => get_string('no'), 1 => get_string('yes'));
         $allowmultiple = array( 1 => "1", 2 => "2", 3 => "3", 4 => "4", 5 => "5");
 
-        $mform->addElement('select', 'preventlate', get_string('preventlate', 'assignment'), $ynoptions);
+        $mform->addElement('select', 'preventlate', get_string('preventlate', 'voiceshadow'), $ynoptions);
         $mform->addElement('select', 'speechtotext', get_string('usespeechtotext', 'voiceshadow'), $ynoptions);
         $mform->setDefault('preventlate', 0);
         $mform->addElement('select', 'allowmultiple', get_string('allowmultiple', 'voiceshadow'), $allowmultiple);
@@ -84,16 +84,20 @@ class mod_voiceshadow_mod_form extends moodleform_mod {
         
         
 //-------------------------------------------------------------------------------
+
+        if (!isset($CFG->assignment_maxbytes))
+            $CFG->assignment_maxbytes = 10485760;
+
         $mform->addElement('header', 'typedesc', get_string("typeupload", 'voiceshadow'));
         $ynoptions = array( 0 => get_string('no'), 1 => get_string('yes'));
 
         $choices = get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
         $choices[0] = get_string('courseuploadlimit') . ' ('.display_size($COURSE->maxbytes).')';
-        $mform->addElement('select', 'maxbytes', get_string('maximumsize', 'assignment'), $choices);
+        $mform->addElement('select', 'maxbytes', get_string('maximumsize', 'voiceshadow'), $choices);
         $mform->setDefault('maxbytes', $CFG->assignment_maxbytes);
 
-        $mform->addElement('select', 'resubmit', get_string('allowdeleting', 'assignment'), $ynoptions);
-        $mform->addHelpButton('resubmit', 'allowdeleting', 'assignment');
+        $mform->addElement('select', 'resubmit', get_string('allowdeleting', 'voiceshadow'), $ynoptions);
+        $mform->addHelpButton('resubmit', 'allowdeleting', 'voiceshadow');
         $mform->setDefault('resubmit', 0);
         $mform->setDefault('maxbytes', 10485760);
         

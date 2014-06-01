@@ -280,3 +280,12 @@ $string['tocreateaslideshow'] = 'Select the number of model sounds to upload';
 $string['vartext'] = 'Audio name';
 $string['allowmultiple'] = 'Allow multiple recordings';
 
+
+$string['availabledate']     = 'Open the voiceshadow';
+$string['duedate']           = 'Close the voiceshadow';
+$string['preventlate']       = 'Prevent later';
+$string['maximumsize']       = 'Maximum size';
+$string['courseuploadlimit'] = 'Course upload limit';
+$string['allowdeleting']     = 'Allow deleting';
+
+
