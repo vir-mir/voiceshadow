@@ -40,6 +40,8 @@
     if(isset($p->itemid) && is_numeric($p->itemid))
       $fid                    = $p->itemid;
     else {
+      $fid                    = (int)substr(time(), 2).rand(0,9) + 0;
+    /*
       if (!empty($id)) {
         if (!$data = $DB->get_record_sql("SELECT itemid FROM {files} WHERE component='mod_voiceshadow' AND filearea='private' ORDER BY itemid DESC LIMIT 1", array($context->id))) { //AND contextid=?
             $fid = 1;
@@ -53,6 +55,7 @@
             $fid = $data->itemid + 1;
         }
       }
+      */
     }
     
     
